@@ -128,7 +128,7 @@ while ! state_done MTDR_DB_PASSWORD_SET; do
 done
 
 
-# Order DB User, Objects
+# DONDE ESTA TU DIOS AHORA?
 while ! state_done TODO_USER; do
   echo "connecting to mtdr database"
   U=$TODO_USER
@@ -140,8 +140,26 @@ CREATE USER $U IDENTIFIED BY "$DB_PASSWORD" DEFAULT TABLESPACE data QUOTA UNLIMI
 GRANT CREATE SESSION, CREATE VIEW, CREATE SEQUENCE, CREATE PROCEDURE TO $U;
 GRANT CREATE TABLE, CREATE TRIGGER, CREATE TYPE, CREATE MATERIALIZED VIEW TO $U;
 GRANT CONNECT, RESOURCE, pdb_dba, SODA_APP to $U;
-CREATE TABLE TODOUSER.todoitem (id NUMBER GENERATED ALWAYS AS IDENTITY, description VARCHAR2(4000), creation_ts TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, done NUMBER(1,0), valiendoCake VARCHAR(55) , PRIMARY KEY (id));
-insert into TODOUSER.todoitem  (description, done) values ('Manual item insert', 0);
+CREATE TABLE Equipo (
+    ID_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre_equipo VARCHAR(255),
+    Descripcion VARCHAR(255)
+);  
+CREATE TABLE Usuario (
+    ID_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255),
+    Tipo_usuario ENUM('developer', 'manager'),
+    ID_equipo INT,
+    FOREIGN KEY (ID_equipo) REFERENCES Equipo(ID_equipo)
+); 
+CREATE TABLE Tareas (
+    ID_tarea INT AUTO_INCREMENT PRIMARY KEY,
+    Titulo VARCHAR(255),
+    Descripcion VARCHAR(255),
+    Estado ENUM('activa', 'finalizada'),
+    ID_usuario INT,
+    FOREIGN KEY (ID_usuario) REFERENCES Usuario(ID_usuario)
+);
 commit;
 !
   state_set_done TODO_USER
