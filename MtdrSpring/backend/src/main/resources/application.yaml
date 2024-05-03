@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver_class_name: oracle.jdbc.OracleDriver
-    password: VelXVelY_0,0
+    password: MyPassword
     url: spring.datasource.url=jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=adb.mx-queretaro-1.oraclecloud.com)(PORT=1522))(CONNECT_DATA=(SERVICE_NAME=g63ee2a86b2af41_reacttodoga2ht_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
     username: TODOUSER
   jpa:
@@ -13,6 +13,6 @@ spring:
   security:
     user:
       name: savera
-      password: VelXVelY_0,0
+      password: MyPassword
 oracle:
   wallet-location: /c/Users/santi/OneDrive/Escritorio/Académico/ITESM/Semestres/6/DISIS/oracle-chatbot/MtdrSpring/wallet
