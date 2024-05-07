@@ -48,3 +48,9 @@ frontend/package-lock.json
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+
+# Post setup files
+MtdrSpring/state/
+MtdrSpring/wallet/
+MtdrSpring/tls/
+MtdrSpring/backend/*.yaml
