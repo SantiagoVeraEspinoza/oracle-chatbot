@@ -55,3 +55,4 @@ MtdrSpring/wallet/
 MtdrSpring/tls/
 MtdrSpring/log/
 MtdrSpring/backend/*.yaml
+MtdrSpring/backend/src/main/resources/application.properties
