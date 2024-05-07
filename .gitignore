@@ -53,4 +53,5 @@ frontend/yarn-error.log*
 MtdrSpring/state/
 MtdrSpring/wallet/
 MtdrSpring/tls/
+MtdrSpring/log/
 MtdrSpring/backend/*.yaml
