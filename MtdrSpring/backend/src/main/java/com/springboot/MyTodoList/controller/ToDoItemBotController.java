@@ -57,7 +57,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 
 				Equipo equipo = getEquiposById(3).getBody();
-				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + chatId, this);
+				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
 
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
