@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -21,8 +22,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.springboot.MyTodoList.model.ToDoItem;
+import com.springboot.MyTodoList.model.Usuario;
 import com.springboot.MyTodoList.model.Equipo;
 import com.springboot.MyTodoList.service.ToDoItemService;
+import com.springboot.MyTodoList.service.UsuarioService;
 import com.springboot.MyTodoList.service.EquipoService;
 import com.springboot.MyTodoList.util.BotCommands;
 import com.springboot.MyTodoList.util.BotHelper;
@@ -33,6 +36,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
 	private ToDoItemService toDoItemService;
+	private UsuarioService usuarioService;
 	private EquipoService equipoService;
 	private String botName;
 
@@ -58,6 +62,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				Equipo equipo = getEquiposById(3).getBody();
 				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
+				// Finish Usuario controller, terminar funcion busqueda por chat id
+				Usuario usuario = getUsuarioByChatId(chatId).getBody();
+				BotHelper.sendMessageToTelegram(chatId, usuario.getNombre(), this);
 
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
@@ -263,6 +270,26 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// GET BY CHAT_ID /equipos/by_chat_id/{id}
+	public ResponseEntity<Usuario> getUsuarioByChatId(@PathVariable long id) {
+		try {
+			Usuario usuario = usuarioService.getItemByChatId(id);
+			
+			// Si no se encuentra el usuario, devuelve 404
+			if (usuario == null) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			
+			// Respuesta exitosa con el usuario encontrado
+			return new ResponseEntity<>(usuario, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error("Error obteniendo usuario por chat ID: {}", id, e);
+			
+			// Respuesta con error interno del servidor
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
