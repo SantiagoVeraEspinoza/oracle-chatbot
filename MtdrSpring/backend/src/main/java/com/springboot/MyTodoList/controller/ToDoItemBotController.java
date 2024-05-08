@@ -21,7 +21,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.springboot.MyTodoList.model.ToDoItem;
+import com.springboot.MyTodoList.model.Equipo;
 import com.springboot.MyTodoList.service.ToDoItemService;
+import com.springboot.MyTodoList.service.EquipoService;
 import com.springboot.MyTodoList.util.BotCommands;
 import com.springboot.MyTodoList.util.BotHelper;
 import com.springboot.MyTodoList.util.BotLabels;
@@ -31,13 +33,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
 	private ToDoItemService toDoItemService;
+	private EquipoService equipoService;
 	private String botName;
 
-	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService) {
+	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
 		logger.info("Bot name: " + botName);
 		this.toDoItemService = toDoItemService;
+		this.equipoService = equipoService;
 		this.botName = botName;
 	}
 
@@ -51,6 +55,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+
+				Equipo equipo = getEquiposById(3).getBody();
+				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre(), this);
 
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
@@ -241,6 +248,22 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	@Override
 	public String getBotUsername() {		
 		return botName;
+	}
+
+	// GET /equipos
+	public List<Equipo> getAllEquipos() { 
+		return equipoService.findAll();
+	}
+
+	// GET BY ID /equipos/{id}
+	public ResponseEntity<Equipo> getEquiposById(@PathVariable int id) {
+		try {
+			ResponseEntity<Equipo> responseEntity = equipoService.getItemById(id);
+			return new ResponseEntity<Equipo>(responseEntity.getBody(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	// GET /todolist
