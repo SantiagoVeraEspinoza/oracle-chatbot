@@ -21,16 +21,16 @@ public class Usuario {
     @Column(name = "ID_EQUIPO")
     int id_equipo;
     @Column(name = "ID_CHAT")
-    int idChat;
+    int id_chat;
     public Usuario(){
 
     }
-    public Usuario(int ID_USUARIO, String nombre, String tipo_usuario, int id_equipo, int idChat) {
+    public Usuario(int ID_USUARIO, String nombre, String tipo_usuario, int id_equipo, int id_chat) {
         this.ID_USUARIO = ID_USUARIO;
         this.nombre = nombre;
         this.tipo_usuario = tipo_usuario;
         this.id_equipo = id_equipo;
-        this.idChat = idChat;
+        this.id_chat = id_chat;
     }
 
     public int getID() {
@@ -66,11 +66,11 @@ public class Usuario {
     }
 
     public int getIdChat() {
-        return idChat;
+        return id_chat;
     }
 
-    public void setIdChat(int idChat) {
-        this.idChat = idChat;
+    public void setIdChat(int id_chat) {
+        this.id_chat = id_chat;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Usuario {
                 ", nombre='" + nombre + '\'' +
                 ", tipo_usuario='" + tipo_usuario + '\'' +
                 ", id_equipo=" + id_equipo +
-                ", id_chat=" + idChat +
+                ", id_chat=" + id_chat +
                 '}';
     }
 }

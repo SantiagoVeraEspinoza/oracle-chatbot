@@ -39,7 +39,7 @@ public class EquipoService {
             return false;
         }
     }
-    public Equipo updateToDoItem(int id, Equipo eq){
+    public Equipo updateEquipoItem(int id, Equipo eq){
         Optional<Equipo> equipoItemData = equipoRepository.findById(id);
         if(equipoItemData.isPresent()){
             Equipo equipoItem = equipoItemData.get();

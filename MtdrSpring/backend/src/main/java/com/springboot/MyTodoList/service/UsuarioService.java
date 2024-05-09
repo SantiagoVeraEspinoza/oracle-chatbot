@@ -2,24 +2,17 @@ package com.springboot.MyTodoList.service;
 
 import com.springboot.MyTodoList.model.Usuario;
 import com.springboot.MyTodoList.repository.UsuarioRepository;
-
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.TypedQuery;
-
 @Service
 public class UsuarioService {
+    
     @Autowired
     private UsuarioRepository usuarioRepository;
     public List<Usuario> findAll(){
@@ -46,7 +39,7 @@ public class UsuarioService {
             return false;
         }
     }
-    public Usuario updateUsuario(int id, Usuario user){
+    public Usuario updateUsuarioItem(int id, Usuario user){
         Optional<Usuario> usuarioItemData = usuarioRepository.findById(id);
         if(usuarioItemData.isPresent()){
             Usuario usuarioItem = usuarioItemData.get();
