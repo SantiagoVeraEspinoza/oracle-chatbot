@@ -13,5 +13,5 @@ import javax.transaction.Transactional;
 @Transactional
 @EnableTransactionManagement
 public interface UsuarioRepository extends JpaRepository<Usuario,Integer> {
-    Optional<Usuario> findByChatId(long chatId);
+    Optional<Usuario> findByIdChat(long idChat);
 }

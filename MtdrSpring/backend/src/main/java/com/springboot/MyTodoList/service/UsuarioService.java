@@ -34,8 +34,8 @@ public class UsuarioService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    public ResponseEntity<Usuario> getItemByChatId(long chatId){
-        Optional<Usuario> usuarioData = usuarioRepository.findByChatId(chatId);
+    public ResponseEntity<Usuario> getItemByIdChat(long chatId){
+        Optional<Usuario> usuarioData = usuarioRepository.findByIdChat(chatId);
         if (usuarioData.isPresent()) {
             return new ResponseEntity<>(usuarioData.get(), HttpStatus.OK);
         } else {
