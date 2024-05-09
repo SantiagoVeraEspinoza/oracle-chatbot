@@ -285,17 +285,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	// GET BY CHAT_ID /equipos/by_chat_id/{id}
-	public ResponseEntity<Usuario> getUsuarioByIdChat(@PathVariable long idChat) {
-		try {
-			ResponseEntity<Usuario> responseEntity = usuarioService.getItemByIdChat(idChat);
-			return new ResponseEntity<Usuario>(responseEntity.getBody(), HttpStatus.OK);
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-
 	// GET /todolist
 	public List<ToDoItem> getAllToDoItems() { 
 		return toDoItemService.findAll();
