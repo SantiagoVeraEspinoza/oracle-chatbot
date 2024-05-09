@@ -80,7 +80,7 @@ public class Usuario {
                 ", nombre='" + nombre + '\'' +
                 ", tipo_usuario='" + tipo_usuario + '\'' +
                 ", id_equipo=" + id_equipo +
-                ", id_chat=" + id_chat +
+                ", id_chat=" + idChat +
                 '}';
     }
 }
