@@ -12,8 +12,8 @@ import java.time.OffsetDateTime;
 @Table(name = "USUARIO")
 public class Usuario {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int ID_USUARIO;
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    long id_usuario;
     @Column(name = "NOMBRE")
     String nombre;
     @Column(name = "TIPO_USUARIO")
@@ -25,20 +25,20 @@ public class Usuario {
     public Usuario(){
 
     }
-    public Usuario(int ID_USUARIO, String nombre, String tipo_usuario, int id_equipo, int id_chat) {
-        this.ID_USUARIO = ID_USUARIO;
+    public Usuario(long id_usuario, String nombre, String tipo_usuario, int id_equipo, int id_chat) {
+        this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.tipo_usuario = tipo_usuario;
         this.id_equipo = id_equipo;
         this.id_chat = id_chat;
     }
 
-    public int getID() {
-        return ID_USUARIO;
+    public long getID() {
+        return id_usuario;
     }
 
-    public void setID(int ID_USUARIO) {
-        this.ID_USUARIO = ID_USUARIO;
+    public void setID(long id_usuario) {
+        this.id_usuario = id_usuario;
     }
 
     public String getNombre() {
@@ -76,7 +76,7 @@ public class Usuario {
     @Override
     public String toString() {
         return "ToDoItem{" +
-                "ID_USUARIO=" + ID_USUARIO +
+                "id_usuario=" + id_usuario +
                 ", nombre='" + nombre + '\'' +
                 ", tipo_usuario='" + tipo_usuario + '\'' +
                 ", id_equipo=" + id_equipo +

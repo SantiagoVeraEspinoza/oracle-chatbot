@@ -19,7 +19,7 @@ public class UsuarioService {
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios;
     }
-    public ResponseEntity<Usuario> getItemById(int id){
+    public ResponseEntity<Usuario> getItemById(long id){
         Optional<Usuario> usuarioData = usuarioRepository.findById(id);
         if (usuarioData.isPresent()){
             return new ResponseEntity<>(usuarioData.get(), HttpStatus.OK);
@@ -31,27 +31,27 @@ public class UsuarioService {
         return usuarioRepository.save(usuarioItem);
     }
 
-    public boolean deleteUsuario(int id){
-        try{
-            usuarioRepository.deleteById(id);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-    public Usuario updateUsuarioItem(int id, Usuario user){
-        Optional<Usuario> usuarioItemData = usuarioRepository.findById(id);
-        if(usuarioItemData.isPresent()){
-            Usuario usuarioItem = usuarioItemData.get();
-            usuarioItem.setID(id);
-            usuarioItem.setNombre(user.getNombre());
-            usuarioItem.setTipoUsuario(user.getTipoUsuario());
-            usuarioItem.setIdEquipo(user.getIdEquipo());
-            usuarioItem.setIdChat(user.getIdChat());
-            return usuarioRepository.save(usuarioItem);
-        }else{
-            return null;
-        }
-    }
+    // public boolean deleteUsuario(long id){
+    //     try{
+    //         usuarioRepository.deleteById(id);
+    //         return true;
+    //     }catch(Exception e){
+    //         return false;
+    //     }
+    // }
+    // public Usuario updateUsuarioItem(long id, Usuario user){
+    //     Optional<Usuario> usuarioItemData = usuarioRepository.findById(id);
+    //     if(usuarioItemData.isPresent()){
+    //         Usuario usuarioItem = usuarioItemData.get();
+    //         usuarioItem.setID(id);
+    //         usuarioItem.setNombre(user.getNombre());
+    //         usuarioItem.setTipoUsuario(user.getTipoUsuario());
+    //         usuarioItem.setIdEquipo(user.getIdEquipo());
+    //         usuarioItem.setIdChat(user.getIdChat());
+    //         return usuarioRepository.save(usuarioItem);
+    //     }else{
+    //         return null;
+    //     }
+    // }
 
 }

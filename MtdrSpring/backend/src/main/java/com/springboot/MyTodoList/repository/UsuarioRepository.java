@@ -10,5 +10,5 @@ import javax.transaction.Transactional;
 @Repository
 @Transactional
 @EnableTransactionManagement
-public interface UsuarioRepository extends JpaRepository<Usuario,Integer> {
+public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
 }

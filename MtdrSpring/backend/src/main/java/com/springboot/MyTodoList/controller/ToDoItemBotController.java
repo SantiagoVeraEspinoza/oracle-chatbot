@@ -276,9 +276,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
+	// GET /equipos
+	public List<Usuario> getAllUsuarios() { 
+		return usuarioService.findAll();
+	}
+
 	// GET BY USER_ID /usuarios/{id}
-	public ResponseEntity<Usuario> getUsuarioById(@PathVariable int id) {
+	public ResponseEntity<Usuario> getUsuarioById(@PathVariable long id) {
 		try {
+			System.out.println("My user id: " + id);
 			ResponseEntity<Usuario> responseEntity = usuarioService.getItemById(id);
 			return new ResponseEntity<Usuario>(responseEntity.getBody(), HttpStatus.OK);
 		} catch (Exception e) {
