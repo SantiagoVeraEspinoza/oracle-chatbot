@@ -21,7 +21,7 @@ public class Usuario {
     @Column(name = "ID_EQUIPO")
     int id_equipo;
     @Column(name = "ID_CHAT")
-    int id_chat;
+    int idChat;
     public Usuario(){
 
     }
