@@ -1,5 +1,8 @@
 package com.springboot.MyTodoList.service;
 
+//import com.springboot.MyTodoList.model.ToDoItem;
+//import com.springboot.MyTodoList.repository.ToDoItemRepository;
+
 import com.springboot.MyTodoList.model.Usuario;
 import com.springboot.MyTodoList.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +15,14 @@ import java.util.Optional;
 
 @Service
 public class UsuarioService {
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
     public List<Usuario> findAll(){
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios;
     }
-    public ResponseEntity<Usuario> getItemById(long id){
+    public ResponseEntity<Usuario> getUsuarioById(long id){
         Optional<Usuario> usuarioData = usuarioRepository.findById(id);
         if (usuarioData.isPresent()){
             return new ResponseEntity<>(usuarioData.get(), HttpStatus.OK);
@@ -27,28 +30,27 @@ public class UsuarioService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    public Usuario addUsuario(Usuario usuarioItem){
-        return usuarioRepository.save(usuarioItem);
+    public Usuario addUsuario(Usuario usuario){
+        return  usuarioRepository.save(usuario);
     }
 
-    // public boolean deleteUsuario(long id){
+    // public boolean deleteToDoItem(int id){
     //     try{
-    //         usuarioRepository.deleteById(id);
+    //         toDoItemRepository.deleteById(id);
     //         return true;
     //     }catch(Exception e){
     //         return false;
     //     }
     // }
-    // public Usuario updateUsuarioItem(long id, Usuario user){
-    //     Optional<Usuario> usuarioItemData = usuarioRepository.findById(id);
-    //     if(usuarioItemData.isPresent()){
-    //         Usuario usuarioItem = usuarioItemData.get();
-    //         usuarioItem.setID(id);
-    //         usuarioItem.setNombre(user.getNombre());
-    //         usuarioItem.setTipoUsuario(user.getTipoUsuario());
-    //         usuarioItem.setIdEquipo(user.getIdEquipo());
-    //         usuarioItem.setIdChat(user.getIdChat());
-    //         return usuarioRepository.save(usuarioItem);
+    // public ToDoItem updateToDoItem(int id, ToDoItem td){
+    //     Optional<ToDoItem> toDoItemData = toDoItemRepository.findById(id);
+    //     if(toDoItemData.isPresent()){
+    //         ToDoItem toDoItem = toDoItemData.get();
+    //         toDoItem.setID(id);
+    //         toDoItem.setCreation_ts(td.getCreation_ts());
+    //         toDoItem.setDescription(td.getDescription());
+    //         toDoItem.setDone(td.isDone());
+    //         return toDoItemRepository.save(toDoItem);
     //     }else{
     //         return null;
     //     }

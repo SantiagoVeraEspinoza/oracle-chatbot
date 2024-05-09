@@ -5,14 +5,14 @@ import javax.persistence.*;
 import java.time.OffsetDateTime;
 
 /*
-    representation of the TODOITEM table that exists already
+    representation of the USUARIO table that exists already
     in the autonomous database
  */
 @Entity
 @Table(name = "USUARIO")
 public class Usuario {
     @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     long id_usuario;
     @Column(name = "NOMBRE")
     String nombre;
@@ -20,24 +20,21 @@ public class Usuario {
     String tipo_usuario;
     @Column(name = "ID_EQUIPO")
     int id_equipo;
-    @Column(name = "ID_CHAT")
-    int id_chat;
     public Usuario(){
 
     }
-    public Usuario(long id_usuario, String nombre, String tipo_usuario, int id_equipo, int id_chat) {
+    public Usuario(long id_usuario, String nombre, String tipo_usuario, int id_equipo) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.tipo_usuario = tipo_usuario;
         this.id_equipo = id_equipo;
-        this.id_chat = id_chat;
     }
 
-    public long getID() {
+    public long getID_usuario() {
         return id_usuario;
     }
 
-    public void setID(long id_usuario) {
+    public void setID_usuario(long id_usuario) {
         this.id_usuario = id_usuario;
     }
 
@@ -49,38 +46,29 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public String getTipoUsuario() {
+    public String getTipo_usuario() {
         return tipo_usuario;
     }
 
-    public void setTipoUsuario(String tipo_usuario) {
+    public void setTipo_usuario(String tipo_usuario) {
         this.tipo_usuario = tipo_usuario;
     }
 
-    public int getIdEquipo() {
+    public int getID_equipo() {
         return id_equipo;
     }
 
-    public void setIdEquipo(int id_equipo) {
+    public void setID_equipo(int id_equipo) {
         this.id_equipo = id_equipo;
-    }
-
-    public int getIdChat() {
-        return id_chat;
-    }
-
-    public void setIdChat(int id_chat) {
-        this.id_chat = id_chat;
     }
 
     @Override
     public String toString() {
-        return "ToDoItem{" +
-                "id_usuario=" + id_usuario +
-                ", nombre='" + nombre + '\'' +
-                ", tipo_usuario='" + tipo_usuario + '\'' +
-                ", id_equipo=" + id_equipo +
-                ", id_chat=" + id_chat +
+        return "Usuario{" +
+                "ID_usuario=" + id_equipo +
+                ", Nombre='" + nombre + '\'' +
+                ", Tipo_usuario=" + tipo_usuario +
+                ", ID_equipo=" + id_equipo +
                 '}';
     }
 }
