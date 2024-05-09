@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -19,8 +20,6 @@ import javax.persistence.TypedQuery;
 
 @Service
 public class UsuarioService {
-    private EntityManager entityManager;
-
     @Autowired
     private UsuarioRepository usuarioRepository;
     public List<Usuario> findAll(){
@@ -35,25 +34,13 @@ public class UsuarioService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    public Usuario getItemByChatId(long chatId){
-        // Crear una consulta JPQL
-        String jpql = "SELECT u FROM USUARIO u WHERE u.chatId = :chatId";
-        TypedQuery<Usuario> query = entityManager.createQuery(jpql, Usuario.class);
-        
-        // Configurar el parámetro de la consulta
-        query.setParameter("chatId", chatId);
-        
-        // Obtener el resultado de la consulta
-        Usuario usuario = null;
-        try {
-            usuario = query.getSingleResult();
-        } catch (javax.persistence.NoResultException e) {
-            // No se encontró ningún resultado
-            // Puedes manejar este caso según tus necesidades
-            return null;
+    public ResponseEntity<Usuario> getItemByChatId(long chatId){
+        Optional<Usuario> usuarioData = usuarioRepository.findByChatId(chatId);
+        if (usuarioData.isPresent()) {
+            return new ResponseEntity<>(usuarioData.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return usuario;
     }
     public Usuario addUsuario(Usuario usuarioItem){
         return usuarioRepository.save(usuarioItem);

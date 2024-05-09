@@ -274,22 +274,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	}
 
 	// GET BY CHAT_ID /equipos/by_chat_id/{id}
-	public ResponseEntity<Usuario> getUsuarioByChatId(@PathVariable long id) {
+	public ResponseEntity<Usuario> getUsuarioByChatId(@PathVariable long chatId) {
 		try {
-			Usuario usuario = usuarioService.getItemByChatId(id);
-			
-			// Si no se encuentra el usuario, devuelve 404
-			if (usuario == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-			
-			// Respuesta exitosa con el usuario encontrado
-			return new ResponseEntity<>(usuario, HttpStatus.OK);
+			ResponseEntity<Usuario> responseEntity = usuarioService.getItemByChatId(chatId);
+			return new ResponseEntity<Usuario>(responseEntity.getBody(), HttpStatus.OK);
 		} catch (Exception e) {
-			logger.error("Error obteniendo usuario por chat ID: {}", id, e);
-			
-			// Respuesta con error interno del servidor
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
