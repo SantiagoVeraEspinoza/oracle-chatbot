@@ -25,12 +25,12 @@ public class Usuario {
     public Usuario(){
 
     }
-    public Usuario(int ID_USUARIO, String nombre, String tipo_usuario, int id_equipo, int id_chat) {
+    public Usuario(int ID_USUARIO, String nombre, String tipo_usuario, int id_equipo, int idChat) {
         this.ID_USUARIO = ID_USUARIO;
         this.nombre = nombre;
         this.tipo_usuario = tipo_usuario;
         this.id_equipo = id_equipo;
-        this.id_chat = id_chat;
+        this.idChat = idChat;
     }
 
     public int getID() {
@@ -66,11 +66,11 @@ public class Usuario {
     }
 
     public int getIdChat() {
-        return id_chat;
+        return idChat;
     }
 
-    public void setIdChat(int id_chat) {
-        this.id_chat = id_chat;
+    public void setIdChat(int idChat) {
+        this.idChat = idChat;
     }
 
     @Override
