@@ -40,12 +40,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private EquipoService equipoService;
 	private String botName;
 
-	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService) {
+	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
 		logger.info("Bot name: " + botName);
 		this.toDoItemService = toDoItemService;
 		this.equipoService = equipoService;
+		this.usuarioService = usuarioService;
 		this.botName = botName;
 	}
 
@@ -275,7 +276,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	// GET BY CHAT_ID /usuarios/{id}
+	// GET BY USER_ID /usuarios/{id}
 	public ResponseEntity<Usuario> getUsuarioById(@PathVariable int id) {
 		try {
 			ResponseEntity<Usuario> responseEntity = usuarioService.getItemById(id);
