@@ -67,9 +67,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					
 				Usuario usuario = getUsuarioById(chatId).getBody();
 
-				if (usuario == null) {
-					BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
-				}
+				// if (usuario == null) {
+				// 	BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
+				// }
+				
+				BotHelper.sendMessageToTelegram(chatId, "Tarea 1:", this);
 				Tareas tarea = getTareaById(1).getBody();
 				BotHelper.sendMessageToTelegram(chatId, tarea.getTitulo(), this);
 
