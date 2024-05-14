@@ -62,15 +62,14 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
 
+			Usuario usuario = getUsuarioById(chatId).getBody();
+
+			if (usuario == null) {
+				BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
+			}
+
 			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
-					
-				// Usuario usuario = getUsuarioById(chatId).getBody();
-
-				// if (usuario == null) {
-				// 	BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
-				// }
-				
 				BotHelper.sendMessageToTelegram(chatId, "Hello!", this);
 				BotHelper.sendMessageToTelegram(chatId, "Tarea 1:", this);
 				Tareas tarea = getTareaById(1).getBody();
