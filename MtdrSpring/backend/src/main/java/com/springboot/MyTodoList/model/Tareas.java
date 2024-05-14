@@ -20,7 +20,7 @@ public class Tareas {
     @Column(name = "ESTADO")
     String estado;
     @Column(name = "ID_USUARIO")
-    int id_usuario;
+    long id_usuario;
     public Tareas(){
 
     }
@@ -64,11 +64,11 @@ public class Tareas {
         this.estado = estado;
     }
 
-    public int getIdUsuario() {
+    public long getIdUsuario() {
         return id_usuario;
     }
 
-    public void setIdUsuario(int id_usuario) {
+    public void setIdUsuario(long id_usuario) {
         this.id_usuario = id_usuario;
     }
 
