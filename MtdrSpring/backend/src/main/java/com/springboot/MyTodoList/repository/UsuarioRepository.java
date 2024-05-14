@@ -16,5 +16,4 @@ import javax.transaction.Transactional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
 
-
 }
