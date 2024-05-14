@@ -24,9 +24,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.springboot.MyTodoList.model.ToDoItem;
 import com.springboot.MyTodoList.model.Usuario;
 import com.springboot.MyTodoList.model.Equipo;
+import com.springboot.MyTodoList.model.Tareas;
 import com.springboot.MyTodoList.service.ToDoItemService;
 import com.springboot.MyTodoList.service.UsuarioService;
 import com.springboot.MyTodoList.service.EquipoService;
+import com.springboot.MyTodoList.service.TareasService;
 import com.springboot.MyTodoList.util.BotCommands;
 import com.springboot.MyTodoList.util.BotHelper;
 import com.springboot.MyTodoList.util.BotLabels;
@@ -38,15 +40,17 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private ToDoItemService toDoItemService;
 	private UsuarioService usuarioService;
 	private EquipoService equipoService;
+	private TareasService tareasService;
 	private String botName;
 
-	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService) {
+	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
 		logger.info("Bot name: " + botName);
 		this.toDoItemService = toDoItemService;
 		this.equipoService = equipoService;
 		this.usuarioService = usuarioService;
+		this.tareasService = tareasService;
 		this.botName = botName;
 	}
 
@@ -60,14 +64,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+					
+				Usuario usuario = getUsuarioById(chatId).getBody();
+
+				if (usuario == null) {
+					BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
+				}
+				Tareas tarea = getTareaById(1).getBody();
+				BotHelper.sendMessageToTelegram(chatId, tarea.getTitulo(), this);
 
 				Equipo equipo = getEquiposById(3).getBody();
 				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
 				// Finish Usuario controller, terminar funcion busqueda por chat id
-				BotHelper.sendMessageToTelegram(chatId, "Nombre:", this);
-				Usuario usuario = getUsuarioById(chatId).getBody();
-				BotHelper.sendMessageToTelegram(chatId, usuario.getNombre(), this);
-				BotHelper.sendMessageToTelegram(chatId, "Nombre enviado!", this);
 
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
@@ -286,6 +294,22 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		try {
 			ResponseEntity<Usuario> responseEntity = usuarioService.getUsuarioById(id);
 			return new ResponseEntity<Usuario>(responseEntity.getBody(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// GET /tareas
+	public List<Tareas> getAllTareas() { 
+		return tareasService.findAll();
+	}
+
+	// GET BY TAREA_ID /tareas/{id}
+	public ResponseEntity<Tareas> getTareaById(@PathVariable int id) {
+		try {
+			ResponseEntity<Tareas> responseEntity = tareasService.getItemById(id);
+			return new ResponseEntity<Tareas>(responseEntity.getBody(), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
