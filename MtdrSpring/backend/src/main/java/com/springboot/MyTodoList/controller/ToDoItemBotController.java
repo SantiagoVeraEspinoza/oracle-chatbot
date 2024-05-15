@@ -94,13 +94,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 			} else if (usuario.getTipo_usuario().equals("nullptr")) {
 				try {
-					if (usuario.getNombre().equals("nullptr")) {
+					if (messageTextFromTelegram.equals("nullptr")) {
 						BotHelper.sendMessageToTelegram(chatId, "El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario ('developer'/'manager')...", this);
-					} else if (!usuario.getNombre().equals("developer") && !usuario.getNombre().equals("manager")) {
+					} else if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
 						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto ('developer'/'manager')", this);
 					}
 
-					usuario.setNombre(messageTextFromTelegram);
+					usuario.setTipo_usuario(messageTextFromTelegram);
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
