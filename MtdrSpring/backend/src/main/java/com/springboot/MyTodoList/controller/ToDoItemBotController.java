@@ -157,7 +157,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				try {
 					String id_equipo_str = messageTextFromTelegram.substring(0,
 						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-					Integer id = Integer.valueOf(id_equipo_str);
+					Integer id = Integer.valueOf(id_equipo_str) + 1;
 
 					usuario.setID_equipo(id);
 
