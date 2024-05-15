@@ -96,9 +96,29 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				try {
 					if (messageTextFromTelegram.equals("nullptr")) {
 						BotHelper.sendMessageToTelegram(chatId, "El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario ('developer'/'manager')...", this);
+						return;
 					} else if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
 						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto ('developer'/'manager')", this);
+						return;
 					}
+
+					SendMessage messageToTelegram = new SendMessage();
+					messageToTelegram.setChatId(chatId);
+
+					ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+					List<KeyboardRow> keyboard = new ArrayList<>();
+
+					KeyboardRow row = new KeyboardRow();
+					row.add("developer");
+					row.add("manager");
+					// Add the first row to the keyboard
+					keyboard.add(row);
+
+					// Set the keyboard
+					keyboardMarkup.setKeyboard(keyboard);
+
+					// Add the keyboard markup
+					messageToTelegram.setReplyMarkup(keyboardMarkup);
 
 					usuario.setTipo_usuario(messageTextFromTelegram);
 
@@ -120,15 +140,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 			} else if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
-				BotHelper.sendMessageToTelegram(chatId, "Hello!", this);
-				BotHelper.sendMessageToTelegram(chatId, "Tarea 1:", this);
-				// Tareas tarea = getTareaById(1).getBody();
-				// BotHelper.sendMessageToTelegram(chatId, tarea.getTitulo(), this);
-
-				// Equipo equipo = getEquiposById(3).getBody();
-				// BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
-				// Finish Usuario controller, terminar funcion busqueda por chat id
-
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
 				messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
