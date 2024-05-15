@@ -87,8 +87,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					if (usuario.getNombre().equals("NULLNAME")) {
 						BotHelper.sendMessageToTelegram(chatId, "El nombre de usuario 'NULNAME' no es válido. Por favor ingrese otro nombre de usuario...", this);
 					} else {
-						BotHelper.sendMessageToTelegram(chatId, "Nombre ingresado correctamente, por favor seleccione un tipo de usuario ('developer'/'manager')", this);
-
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
 						messageToTelegram.setText("Nombre ingresado correctamente, por favor seleccione un tipo de usuario ('developer'/'manager')");
@@ -126,7 +124,32 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
-					BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...", this);
+					List<Equipo> equipos = getAllEquipos();
+					equipos.remove(0); // Remove the null team
+
+					if (equipos.isEmpty()) {
+						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
+					} else {
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...");
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						for (Equipo equipo : equipos) {
+							KeyboardRow currentRow = new KeyboardRow();
+							currentRow.add((equipo.getID() - 1) + equipo.getNombre());
+							keyboard.add(currentRow);
+						}
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+						execute(messageToTelegram);
+					}
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
