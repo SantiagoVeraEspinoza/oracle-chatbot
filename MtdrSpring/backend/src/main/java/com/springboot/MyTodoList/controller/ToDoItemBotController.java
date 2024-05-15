@@ -78,8 +78,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} 
-			else if (usuario.getNombre().equals("NULLNAME")) {
+			} else if (usuario.getNombre().equals("NULLNAME")) {
 				try {
 					usuario.setNombre(messageTextFromTelegram);
 
@@ -90,6 +89,32 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} else {
 						BotHelper.sendMessageToTelegram(chatId, "Nombre ingresado correctamente, por favor seleccione un tipo de usuario ('developer'/'manager')", this);
 					}
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+			} else if (usuario.getTipo_usuario().equals("nullptr")) {
+				try {
+					if (usuario.getNombre().equals("nullptr")) {
+						BotHelper.sendMessageToTelegram(chatId, "El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario ('developer'/'manager')...", this);
+					} else if (!usuario.getNombre().equals("developer") && !usuario.getNombre().equals("manager")) {
+						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto ('developer'/'manager')", this);
+					}
+
+					usuario.setNombre(messageTextFromTelegram);
+
+					ResponseEntity entity = updateUsuario(usuario, chatId);
+
+					BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...", this);
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+			} else if (usuario.getID_equipo() == 1) {
+				try {
+					usuario.setID_equipo(Integer.parseInt(messageTextFromTelegram));
+
+					ResponseEntity entity = updateUsuario(usuario, chatId);
+
+					BotHelper.sendMessageToTelegram(chatId, "Usuario registrado correctamente, ahora puede utilizar el resto de comandos...", this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
