@@ -66,8 +66,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			if (usuario == null) {
 				try {
-					BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
-
 					Usuario new_usuario = new Usuario();
 					new_usuario.setID_usuario(chatId);
 					new_usuario.setID_equipo(1);
@@ -75,12 +73,27 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					new_usuario.setTipo_usuario("nullptr");
 
 					ResponseEntity entity = addUsuario(new_usuario);
+					
+					BotHelper.sendMessageToTelegram(chatId, "Usuario no encontrado, porfavor ingrese su nombre de usuario...", this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			}
+			} 
+			else if (usuario.getNombre().equals("NULLNAME")) {
+				try {
+					usuario.setNombre(messageTextFromTelegram);
 
-			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
+					ResponseEntity entity = updateUsuario(usuario, chatId);
+
+					if (usuario.getNombre().equals("NULLNAME")) {
+						BotHelper.sendMessageToTelegram(chatId, "El nombre de usuario 'NULNAME' no es válido. Por favor ingrese otro nombre de usuario...", this);
+					} else {
+						BotHelper.sendMessageToTelegram(chatId, "Nombre ingresado correctamente, por favor seleccione un tipo de usuario ('developer'/'manager')", this);
+					}
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+			} else if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 				BotHelper.sendMessageToTelegram(chatId, "Hello!", this);
 				BotHelper.sendMessageToTelegram(chatId, "Tarea 1:", this);
@@ -354,6 +367,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		responseHeaders.set("Access-Control-Expose-Headers", "location");
 
 		return ResponseEntity.ok().headers(responseHeaders).build();
+	}
+
+	// UPDATE /usuario/{id}
+	public ResponseEntity updateUsuario(@RequestBody Usuario usuarioItem, @PathVariable long id) {
+		try {
+			Usuario usuarioItem1 = usuarioService.updateUsuario(id, usuarioItem);
+			System.out.println(usuarioItem1.toString());
+			return new ResponseEntity<>(usuarioItem1, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
 	}
 
 	// PUT /todolist

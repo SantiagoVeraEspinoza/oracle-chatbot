@@ -42,18 +42,19 @@ public class UsuarioService {
     //         return false;
     //     }
     // }
-    // public ToDoItem updateToDoItem(int id, ToDoItem td){
-    //     Optional<ToDoItem> toDoItemData = toDoItemRepository.findById(id);
-    //     if(toDoItemData.isPresent()){
-    //         ToDoItem toDoItem = toDoItemData.get();
-    //         toDoItem.setID(id);
-    //         toDoItem.setCreation_ts(td.getCreation_ts());
-    //         toDoItem.setDescription(td.getDescription());
-    //         toDoItem.setDone(td.isDone());
-    //         return toDoItemRepository.save(toDoItem);
-    //     }else{
-    //         return null;
-    //     }
-    // }
+
+    public Usuario updateUsuario(long id, Usuario us){
+        Optional<Usuario> usuarioData = usuarioRepository.findById(id);
+        if(usuarioData.isPresent()){
+            Usuario usuarioItem = usuarioData.get();
+            usuarioItem.setID_usuario(id);
+            usuarioItem.setNombre(us.getNombre());
+            usuarioItem.setTipo_usuario(us.getTipo_usuario());
+            usuarioItem.setID_equipo(us.getID_equipo());
+            return usuarioRepository.save(usuarioItem);
+        }else{
+            return null;
+        }
+    }
 
 }
