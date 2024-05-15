@@ -89,7 +89,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} else {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Nombre ingresado correctamente, por favor seleccione un tipo de usuario ('developer'/'manager')");
+						messageToTelegram.setText("Nombre ingresado correctamente, por favor seleccione un tipo de usuario...");
 
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
@@ -113,10 +113,46 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			} else if (usuario.getTipo_usuario().equals("nullptr")) {
 				try {
 					if (messageTextFromTelegram.equals("nullptr")) {
-						BotHelper.sendMessageToTelegram(chatId, "El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario ('developer'/'manager')...", this);
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario...");
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						KeyboardRow row = new KeyboardRow();
+						row.add("developer");
+						row.add("manager");
+						// Add the first row to the keyboard
+						keyboard.add(row);
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+						execute(messageToTelegram);
 						return;
 					} else if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
-						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto ('developer'/'manager')", this);
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto. Por favor ingrese un tipo de usuario correcto...");
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						KeyboardRow row = new KeyboardRow();
+						row.add("developer");
+						row.add("manager");
+						// Add the first row to the keyboard
+						keyboard.add(row);
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+						execute(messageToTelegram);
 						return;
 					}
 
@@ -160,6 +196,32 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					Integer id = Integer.valueOf(id_equipo_str) + 1;
 
 					usuario.setID_equipo(id);
+
+					if (usuario.getID_equipo() == 1) {
+						List<Equipo> equipos = getAllEquipos();
+						equipos.remove(0); // Remove the null team
+
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Entrada para equipo incorrecta, por favor seleccione un equipo para el usuario...");
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						for (Equipo equipo : equipos) {
+							KeyboardRow currentRow = new KeyboardRow();
+							currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
+							keyboard.add(currentRow);
+						}
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+						execute(messageToTelegram);
+						return;
+					}
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
