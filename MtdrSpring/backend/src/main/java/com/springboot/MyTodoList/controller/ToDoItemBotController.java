@@ -110,7 +110,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} else if (usuario.getTipo_usuario().equals("nullptr")) {
+			} else if (usuario.getTipo_usuario().equals("nullptr") || getEquiposById(usuario.getID_equipo()).getBody().getNombre() == "NULLNAME" || getEquiposById(usuario.getID_equipo()).getBody().getDescripcion() == "NULLDESC") {
 				try {
 					if (messageTextFromTelegram.equals("nullptr")) {
 						SendMessage messageToTelegram = new SendMessage();
@@ -158,12 +158,20 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					usuario.setTipo_usuario(messageTextFromTelegram);
 
-					ResponseEntity entity = updateUsuario(usuario, chatId);
+					ResponseEntity usuario_entity = updateUsuario(usuario, chatId);
 
 					List<Equipo> equipos = getAllEquipos();
 					equipos.remove(0); // Remove the null team
 
 					if (equipos.isEmpty()) {
+						Equipo new_equipo = new Equipo();
+						new_equipo.setNombre("NULLNAME");
+						new_equipo.setDescripcion("NULLDESC");
+						
+						ResponseEntity equipo_entity = addEquipo(new_equipo);
+
+						usuario.setID_equipo(new_equipo.getID());
+
 						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
 					} else {
 						SendMessage messageToTelegram = new SendMessage();
@@ -436,6 +444,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	public ResponseEntity addEquipo(@RequestBody Equipo equipoItem) throws Exception { // Se quedeo aqi
+		Equipo eq = equipoService.addEquipo(equipoItem);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set("location", "" + eq.getID());
+		responseHeaders.set("Access-Control-Expose-Headers", "location");
+
+		return ResponseEntity.ok().headers(responseHeaders).build();
 	}
 
 	// GET /equipos
