@@ -139,7 +139,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 						for (Equipo equipo : equipos) {
 							KeyboardRow currentRow = new KeyboardRow();
-							currentRow.add((equipo.getID() - 1) + equipo.getNombre());
+							currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
 							keyboard.add(currentRow);
 						}
 
@@ -155,7 +155,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 			} else if (usuario.getID_equipo() == 1) {
 				try {
-					usuario.setID_equipo(Integer.parseInt(messageTextFromTelegram));
+					String id_equipo_str = messageTextFromTelegram.substring(0,
+						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(id_equipo_str);
+
+					usuario.setID_equipo(id);
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
