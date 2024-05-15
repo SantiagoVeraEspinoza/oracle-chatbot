@@ -31,7 +31,7 @@ public class UsuarioService {
         }
     }
     public Usuario addUsuario(Usuario usuario){
-        return  usuarioRepository.save(usuario);
+        return usuarioRepository.save(usuario);
     }
 
     // public boolean deleteToDoItem(int id){

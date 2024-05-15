@@ -65,18 +65,30 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			Usuario usuario = getUsuarioById(chatId).getBody();
 
 			if (usuario == null) {
-				BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
+				try {
+					BotHelper.sendMessageToTelegram(chatId, "No existo!", this);
+
+					Usuario new_usuario = new Usuario();
+					new_usuario.setID_usuario(chatId);
+					new_usuario.setID_equipo(1);
+					new_usuario.setNombre("NULLNAME");
+					new_usuario.setTipo_usuario("nullptr");
+
+					ResponseEntity entity = addUsuario(new_usuario);
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
 			}
 
 			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 				BotHelper.sendMessageToTelegram(chatId, "Hello!", this);
 				BotHelper.sendMessageToTelegram(chatId, "Tarea 1:", this);
-				Tareas tarea = getTareaById(1).getBody();
-				BotHelper.sendMessageToTelegram(chatId, tarea.getTitulo(), this);
+				// Tareas tarea = getTareaById(1).getBody();
+				// BotHelper.sendMessageToTelegram(chatId, tarea.getTitulo(), this);
 
-				Equipo equipo = getEquiposById(3).getBody();
-				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
+				// Equipo equipo = getEquiposById(3).getBody();
+				// BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + Long.toString(chatId), this);
 				// Finish Usuario controller, terminar funcion busqueda por chat id
 
 				SendMessage messageToTelegram = new SendMessage();
@@ -245,23 +257,23 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			}
 
-			else {
-				try {
-					ToDoItem newItem = new ToDoItem();
-					newItem.setDescription(messageTextFromTelegram);
-					newItem.setCreation_ts(OffsetDateTime.now());
-					newItem.setDone(false);
-					ResponseEntity entity = addToDoItem(newItem);
+			// else {
+			// 	try {
+			// 		ToDoItem newItem = new ToDoItem();
+			// 		newItem.setDescription(messageTextFromTelegram);
+			// 		newItem.setCreation_ts(OffsetDateTime.now());
+			// 		newItem.setDone(false);
+			// 		ResponseEntity entity = addToDoItem(newItem);
 
-					SendMessage messageToTelegram = new SendMessage();
-					messageToTelegram.setChatId(chatId);
-					messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+			// 		SendMessage messageToTelegram = new SendMessage();
+			// 		messageToTelegram.setChatId(chatId);
+			// 		messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
 
-					execute(messageToTelegram);
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-			}
+			// 		execute(messageToTelegram);
+			// 	} catch (Exception e) {
+			// 		logger.error(e.getLocalizedMessage(), e);
+			// 	}
+			// }
 		}
 	}
 
@@ -332,6 +344,16 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	
+	public ResponseEntity addUsuario(@RequestBody Usuario usuarioItem) throws Exception { // Se quedeo aqi
+		Usuario us = usuarioService.addUsuario(usuarioItem);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set("location", "" + us.getID_usuario());
+		responseHeaders.set("Access-Control-Expose-Headers", "location");
+
+		return ResponseEntity.ok().headers(responseHeaders).build();
 	}
 
 	// PUT /todolist
