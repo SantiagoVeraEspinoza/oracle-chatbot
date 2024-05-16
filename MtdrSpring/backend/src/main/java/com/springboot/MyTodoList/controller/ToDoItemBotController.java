@@ -177,6 +177,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 							keyboard.add(currentRow);
 						}
 
+						KeyboardRow currentRow = new KeyboardRow();
+						currentRow.add("Añadir nuevo equipo");
+						keyboard.add(currentRow);
+
 						// Set the keyboard
 						keyboardMarkup.setKeyboard(keyboard);
 
@@ -191,13 +195,24 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			} 
 			if (usuario.getID_equipo() == 1) {
 				try {
+					if (messageTextFromTelegram.equals("Añadir nuevo equipo")) {
+						Equipo new_equipo = new Equipo();
+						new_equipo.setNombre("NULLNAME");
+						new_equipo.setDescripcion("NULLDESC");
+						
+						ResponseEntity equipo_entity = addEquipo(new_equipo);
+
+						usuario.setID_equipo(new_equipo.getID());
+
+						ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
+
+						BotHelper.sendMessageToTelegram(chatId, "Ingrese el nombre de un nuevo equipo...", this);
+						return;
+					}
+
 					String id_equipo_str = messageTextFromTelegram.substring(0,
 						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
 					Integer id = Integer.valueOf(id_equipo_str) + 1;
-
-					usuario.setID_equipo(id);
-
-					Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
 
 					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
@@ -216,6 +231,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 							keyboard.add(currentRow);
 						}
 
+						KeyboardRow currentRow = new KeyboardRow();
+						currentRow.add("Añadir nuevo equipo");
+						keyboard.add(currentRow);
+
 						// Set the keyboard
 						keyboardMarkup.setKeyboard(keyboard);
 
@@ -224,6 +243,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						execute(messageToTelegram);
 						return;
 					}
+					
+					usuario.setID_equipo(id);
+
+					Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
