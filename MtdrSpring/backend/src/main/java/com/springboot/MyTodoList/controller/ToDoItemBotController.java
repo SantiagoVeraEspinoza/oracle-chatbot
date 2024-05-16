@@ -83,7 +83,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} else if (usuario.getNombre().equals("NULLNAME")) {
+				return;
+			} 
+			if (usuario.getNombre().equals("NULLNAME")) {
 				try {
 					usuario.setNombre(messageTextFromTelegram);
 
@@ -115,9 +117,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} else if (usuario.getTipo_usuario().equals("nullptr") || 
-					   getEquiposById(usuario.getID_equipo()).getBody().getNombre() == "NULLNAME" || 
-					   getEquiposById(usuario.getID_equipo()).getBody().getDescripcion() == "NULLDESC") {
+				return;
+			} 
+			if (usuario.getTipo_usuario().equals("nullptr")) {
 				try {
 					if (messageTextFromTelegram.equals("nullptr")) {
 						SendMessage messageToTelegram = new SendMessage();
@@ -139,7 +141,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						// Add the keyboard markup
 						messageToTelegram.setReplyMarkup(keyboardMarkup);
 						execute(messageToTelegram);
-						return;
 					} else if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
@@ -180,29 +181,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						usuario.setID_equipo(new_equipo.getID());
 
 						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
-					} else if (getEquiposById(usuario.getID_equipo()).getBody().getNombre() == "NULLNAME") {
-						Equipo equipo_t1 = getEquiposById(usuario.getID_equipo()).getBody();
-						equipo_t1.setNombre(messageTextFromTelegram);
-
-						ResponseEntity entity_et1 = updateEquipo(equipo_t1, usuario.getID_equipo());
-
-						if (equipo_t1.getNombre().equals("NULLNAME")) {
-							BotHelper.sendMessageToTelegram(chatId, "El nombre de equipo 'NULNAME' no es válido. Por favor ingrese otro nombre de equipo...", this);
-						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Nombre ingresado correctamente, por favor ingrese la descripcion de dicho equipo...", this);
-						}
-					} else if (getEquiposById(usuario.getID_equipo()).getBody().getDescripcion() == "NULLDESC") {
-						Equipo equipo_t2 = getEquiposById(usuario.getID_equipo()).getBody();
-						equipo_t2.setDescripcion(messageTextFromTelegram);
-
-						ResponseEntity entity_et2 = updateEquipo(equipo_t2, usuario.getID_equipo());
-
-						if (equipo_t2.getDescripcion().equals("NULLDESC")) {
-							BotHelper.sendMessageToTelegram(chatId, "La descripción de equipo 'NULLDESC' no es válida. Por favor ingrese otra descripción de equipo...", this);
-						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Descripción ingresada correctamente, por favor ingrese la descripcion de dicho equipo...", this);
-						}
-					}else {
+					} else {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
 						messageToTelegram.setText("Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...");
@@ -226,7 +205,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} else if (usuario.getID_equipo() == 1) {
+				return;
+			} 
+			if (usuario.getID_equipo() == 1) {
 				try {
 					String id_equipo_str = messageTextFromTelegram.substring(0,
 						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
@@ -266,7 +247,21 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-			} else if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
+				return;
+			} 
+			if (equipo_usuario != null && equipo_usuario.getID() != 1) {
+				if (equipo_usuario.getNombre().equals("NULLNAME")) {
+					try {
+						equipo_usuario.setNombre(messageTextFromTelegram);
+
+						ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+				}
+				return;
+			}
+			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
