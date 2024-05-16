@@ -214,6 +214,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
 					Integer id = Integer.valueOf(id_equipo_str) + 1;
 
+					usuario.setID_equipo(id);
+
 					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
 						equipos.remove(0); // Remove the null team
@@ -243,8 +245,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						execute(messageToTelegram);
 						return;
 					}
-					
-					usuario.setID_equipo(id);
 
 					Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
 
