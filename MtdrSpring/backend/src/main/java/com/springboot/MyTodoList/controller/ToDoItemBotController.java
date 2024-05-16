@@ -96,7 +96,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} else {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Nombre ingresado correctamente, por favor seleccione un tipo de usuario...");
+						messageToTelegram.setText("Nombre '" + usuario.getNombre() +  "' ingresado correctamente, por favor seleccione un tipo de usuario...");
 
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
@@ -162,7 +162,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 						ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
 
-						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
+						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario '" + usuario.getTipo_usuario() + "' ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
 					} else {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
@@ -197,6 +197,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					usuario.setID_equipo(id);
 
+					Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
+
 					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
 						equipos.remove(0); // Remove the null team
@@ -225,7 +227,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
-					BotHelper.sendMessageToTelegram(chatId, "Usuario registrado correctamente, ahora puede utilizar el resto de comandos...", this);
+					BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
@@ -237,6 +239,28 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						equipo_usuario.setNombre(messageTextFromTelegram);
 
 						ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
+
+						if (equipo_usuario.getDescripcion() == "NULLDESC") {
+							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente, ingrese la descripción del equipo...", this);
+						} else {
+							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
+						}
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+					return;
+				}
+				if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
+					try {
+						equipo_usuario.setDescripcion(messageTextFromTelegram);
+
+						ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
+
+						if (equipo_usuario.getNombre() == "NULLNAME") {
+							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente, ingrese el nombre del equipo...", this);
+						} else {
+							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
+						}
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}
