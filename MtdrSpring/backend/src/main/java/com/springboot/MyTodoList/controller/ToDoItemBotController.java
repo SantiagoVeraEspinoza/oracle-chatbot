@@ -121,27 +121,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			} 
 			if (usuario.getTipo_usuario().equals("nullptr")) {
 				try {
-					if (messageTextFromTelegram.equals("nullptr")) {
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("El tipo de usuario 'nullptr' no es válido. Por favor ingrese otro tipo de usuario...");
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						KeyboardRow row = new KeyboardRow();
-						row.add("developer");
-						row.add("manager");
-						// Add the first row to the keyboard
-						keyboard.add(row);
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						execute(messageToTelegram);
-					} else if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
+					if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
 						messageToTelegram.setText("Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto. Por favor ingrese un tipo de usuario correcto...");
@@ -179,6 +159,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						ResponseEntity equipo_entity = addEquipo(new_equipo);
 
 						usuario.setID_equipo(new_equipo.getID());
+
+						ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
 
 						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
 					} else {
@@ -258,8 +240,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}
+					return;
 				}
-				return;
 			}
 			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
