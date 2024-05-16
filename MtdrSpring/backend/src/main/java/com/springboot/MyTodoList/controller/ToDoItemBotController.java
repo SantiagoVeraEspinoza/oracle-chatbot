@@ -63,6 +63,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			long chatId = update.getMessage().getChatId();
 
 			Usuario usuario = getUsuarioById(chatId).getBody();
+			Equipo equipo = null;
+			if (usuario != null) {
+				equipo = getEquiposById(usuario.getID_equipo()).getBody();
+				BotHelper.sendMessageToTelegram(chatId, equipo.getNombre() + " - " + equipo.getDescripcion(), this);
+			}
 
 			if (usuario == null) {
 				try {
