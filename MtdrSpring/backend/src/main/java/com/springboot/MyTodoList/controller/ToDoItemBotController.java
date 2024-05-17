@@ -398,7 +398,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				keyboard.add(myTodoListTitleRow);
 
 				//Obtenemos las tareas solo de este usuario
-				List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getID_usuario() == chatId)
+				List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
 				 		.collect(Collectors.toList());
 				
 				//Obtenemos las tareas activas
@@ -409,7 +409,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(tar.getDescripcion());
-					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
 					keyboard.add(currentRow);
 				}
 				//Obtenemos tareas finalizadas
@@ -419,8 +419,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				for (Tareas tar : tareasFinalizadas) {
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(tar.getDescripcion());
-					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 					keyboard.add(currentRow);
 				}
 
@@ -484,7 +484,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					newTarea.setTitulo("TITULO PRUEBA");
 					newTarea.setDescripcion(messageTextFromTelegram);
 					newTarea.setEstado("activa");
-					newTarea.setID_usuario(chatId);
+					newTarea.setIdUsuario(chatId);
 					
 					ResponseEntity entity = addTarea(newTarea);
 
@@ -578,7 +578,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	public ResponseEntity addTarea(@RequestBody Tareas tarea) throws Exception {
 		Tareas tar = tareasService.addTarea(tarea);  
 		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("location", "" + tar.getID_usuario());
+		responseHeaders.set("location", "" + tar.getID());
 		responseHeaders.set("Access-Control-Expose-Headers", "location");
 		// URI location = URI.create(""+td.getID())
 
