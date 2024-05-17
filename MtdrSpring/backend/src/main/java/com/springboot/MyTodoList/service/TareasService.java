@@ -19,7 +19,7 @@ public class TareasService {
         List<Tareas> tareas = tareasRepository.findAll();
         return tareas;
     }
-    public ResponseEntity<Tareas> getItemById(int id){
+    public ResponseEntity<Tareas> getTareaById(int id){
         Optional<Tareas> tareasData = tareasRepository.findById(id);
         if (tareasData.isPresent()){
             return new ResponseEntity<>(tareasData.get(), HttpStatus.OK);
@@ -39,7 +39,7 @@ public class TareasService {
             return false;
         }
     }
-    public Tareas updateEquipoItem(int id, Tareas ta){
+    public Tareas updateTarea(int id, Tareas ta){
         Optional<Tareas> tareaItemData = tareasRepository.findById(id);
         if(tareaItemData.isPresent()){
             Tareas tareaItem = tareaItemData.get();

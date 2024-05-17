@@ -329,9 +329,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 
-					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(true);
-					updateToDoItem(item, id);
+					Tareas tarea = getTareaById(id).getBody();
+					tarea.setEstado("finalizada");
+					updateTarea(tarea, id);
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
 
 				} catch (Exception e) {
@@ -346,9 +346,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 
-					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(false);
-					updateToDoItem(item, id);
+					Tareas tarea = getTareaById(id).getBody();
+					tarea.setEstado("activa");
+					updateTarea(tarea, id);
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
 
 				} catch (Exception e) {
@@ -363,7 +363,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 
-					deleteToDoItem(id).getBody();
+					deleteTarea(id).getBody();
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DELETED.getMessage(), this);
 
 				} catch (Exception e) {
@@ -379,7 +379,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					|| messageTextFromTelegram.equals(BotLabels.LIST_ALL_ITEMS.getLabel())
 					|| messageTextFromTelegram.equals(BotLabels.MY_TODO_LIST.getLabel())) {
 
-				List<ToDoItem> allItems = getAllToDoItems();
+						//Obtenemos todas las tareas
+				List<Tareas> tareas = getAllTareas();
 				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 				List<KeyboardRow> keyboard = new ArrayList<>();
 
@@ -396,25 +397,30 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
 				keyboard.add(myTodoListTitleRow);
 
-				List<ToDoItem> activeItems = allItems.stream().filter(item -> item.isDone() == false)
-						.collect(Collectors.toList());
+				//Obtenemos las tareas solo de este usuario
+				List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getID_usuario() == chatId)
+				 		.collect(Collectors.toList());
+				
+				//Obtenemos las tareas activas
+				List<Tareas> tareasActivas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("activa"))
+				 		.collect(Collectors.toList());
 
-				for (ToDoItem item : activeItems) {
+				for (Tareas tar : tareasActivas) {
 
 					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+					currentRow.add(tar.getDescripcion());
+					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
 					keyboard.add(currentRow);
 				}
+				//Obtenemos tareas finalizadas
+				List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada"))
+				 		.collect(Collectors.toList());
 
-				List<ToDoItem> doneItems = allItems.stream().filter(item -> item.isDone() == true)
-						.collect(Collectors.toList());
-
-				for (ToDoItem item : doneItems) {
+				for (Tareas tar : tareasFinalizadas) {
 					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+					currentRow.add(tar.getDescripcion());
+					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+					currentRow.add(tar.getID_tarea() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 					keyboard.add(currentRow);
 				}
 
@@ -425,9 +431,25 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				keyboardMarkup.setKeyboard(keyboard);
 
+				//Mensaje con tus tareas y titulos 
+				StringBuilder messageBuilder = new StringBuilder();
+				
+				messageBuilder.append("MIS TAREAS ACTIVAS").append("\n").append("\n");
+				
+				for (Tareas tar : tareasActivas) {
+					messageBuilder.append(tar.getTitulo()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+				}
+
+				messageBuilder.append("MIS TAREAS FINALIZADAS").append("\n").append("\n");
+
+				for (Tareas tar : tareasFinalizadas) {
+					messageBuilder.append(tar.getTitulo()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+				}
+
 				SendMessage messageToTelegram = new SendMessage();
 				messageToTelegram.setChatId(chatId);
-				messageToTelegram.setText(BotLabels.MY_TODO_LIST.getLabel());
+				String message = messageBuilder.toString();
+				messageToTelegram.setText(message);
 				messageToTelegram.setReplyMarkup(keyboardMarkup);
 
 				try {
@@ -455,23 +477,26 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			}
 
-			// else {
-			// 	try {
-			// 		ToDoItem newItem = new ToDoItem();
-			// 		newItem.setDescription(messageTextFromTelegram);
-			// 		newItem.setCreation_ts(OffsetDateTime.now());
-			// 		newItem.setDone(false);
-			// 		ResponseEntity entity = addToDoItem(newItem);
+			else {
+				try {
+					//MODIFICADO PARA AÑADIR TAREAS A NUESTRA TABLA
+					Tareas newTarea = new Tareas();
+					newTarea.setTitulo("TITULO PRUEBA");
+					newTarea.setDescripcion(messageTextFromTelegram);
+					newTarea.setEstado("activa");
+					newTarea.setID_usuario(chatId);
+					
+					ResponseEntity entity = addTarea(newTarea);
 
-			// 		SendMessage messageToTelegram = new SendMessage();
-			// 		messageToTelegram.setChatId(chatId);
-			// 		messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+					SendMessage messageToTelegram = new SendMessage();
+					messageToTelegram.setChatId(chatId);
+					messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
 
-			// 		execute(messageToTelegram);
-			// 	} catch (Exception e) {
-			// 		logger.error(e.getLocalizedMessage(), e);
-			// 	}
-			// }
+					execute(messageToTelegram);
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+			}
 		}
 	}
 
@@ -538,14 +563,49 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		return tareasService.findAll();
 	}
 
-	// GET BY TAREA_ID /tareas/{id}
+	// GET BY ID /tarea/{id}
 	public ResponseEntity<Tareas> getTareaById(@PathVariable int id) {
 		try {
-			ResponseEntity<Tareas> responseEntity = tareasService.getItemById(id);
+			ResponseEntity<Tareas> responseEntity = tareasService.getTareaById(id);
 			return new ResponseEntity<Tareas>(responseEntity.getBody(), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// PUT /Tarea
+	public ResponseEntity addTarea(@RequestBody Tareas tarea) throws Exception {
+		Tareas tar = tareasService.addTarea(tarea);  
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set("location", "" + tar.getID_usuario());
+		responseHeaders.set("Access-Control-Expose-Headers", "location");
+		// URI location = URI.create(""+td.getID())
+
+		return ResponseEntity.ok().headers(responseHeaders).build();
+	}
+
+	// UPDATE /tarea/{id}
+	public ResponseEntity updateTarea(@RequestBody Tareas tarea, @PathVariable int id) {
+		try {
+			Tareas tar = tareasService.updateTarea(id, tarea);
+			System.out.println(tar.toString());
+			return new ResponseEntity<>(tar, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// DELETE tarea/{id}
+	public ResponseEntity<Boolean> deleteTarea(@PathVariable("id") int id) {
+		Boolean flag = false;
+		try {
+			flag = tareasService.deleteTarea(id);
+			return new ResponseEntity<>(flag, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(flag, HttpStatus.NOT_FOUND);
 		}
 	}
 

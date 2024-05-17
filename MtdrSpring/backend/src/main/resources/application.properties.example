@@ -25,3 +25,6 @@ logging.level.oracle.ucp=trace
 
 #telegram.bot.token=<TOKEN>
 #telegram.bot.name=<USER_IDENTIFIER>
+
+telegram.bot.token=7128848572:AAG-jLfA6j4jnHQ7xQdTv4N92gboYjczWrk
+telegram.bot.name=ermac_java_bot
