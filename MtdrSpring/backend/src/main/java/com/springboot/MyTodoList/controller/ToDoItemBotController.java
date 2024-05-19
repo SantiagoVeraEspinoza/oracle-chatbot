@@ -207,7 +207,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						return;
 					}
 
-					if (!messageTextFromTelegram.contains(Character.toString('-'))) {
+					char ch = '-';
+					BotHelper.sendMessageToTelegram(chatId, "1", this);
+					if (!messageTextFromTelegram.contains(Character.toString(ch))) {
+						BotHelper.sendMessageToTelegram(chatId, messageTextFromTelegram, this);
 						messageTextFromTelegram = "1-NULL";
 					}
 
