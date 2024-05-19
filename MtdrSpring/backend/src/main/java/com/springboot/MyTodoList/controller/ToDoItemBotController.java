@@ -207,6 +207,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						return;
 					}
 
+					if (!messageTextFromTelegram.contains(Character.toString('-'))) {
+						return;
+					}
+
 					String id_equipo_str = messageTextFromTelegram.substring(0,
 						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
 					Integer id = Integer.valueOf(id_equipo_str) + 1;
