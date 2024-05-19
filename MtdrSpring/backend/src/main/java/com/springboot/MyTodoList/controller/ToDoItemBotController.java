@@ -220,6 +220,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					usuario.setID_equipo(id);
 
+					BotHelper.sendMessageToTelegram(chatId, messageTextFromTelegram + usuario.getID_equipo(), this);
 					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
 						equipos.remove(0); // Remove the null team
