@@ -208,9 +208,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 
 					char ch = '-';
-					BotHelper.sendMessageToTelegram(chatId, "1", this);
 					if (!messageTextFromTelegram.contains(Character.toString(ch))) {
-						BotHelper.sendMessageToTelegram(chatId, messageTextFromTelegram, this);
 						messageTextFromTelegram = "0-NULL";
 					}
 
@@ -220,7 +218,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					usuario.setID_equipo(id);
 
-					BotHelper.sendMessageToTelegram(chatId, messageTextFromTelegram + usuario.getID_equipo(), this);
 					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
 						equipos.remove(0); // Remove the null team
