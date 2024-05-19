@@ -211,7 +211,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					BotHelper.sendMessageToTelegram(chatId, "1", this);
 					if (!messageTextFromTelegram.contains(Character.toString(ch))) {
 						BotHelper.sendMessageToTelegram(chatId, messageTextFromTelegram, this);
-						messageTextFromTelegram = "1-NULL";
+						messageTextFromTelegram = "0-NULL";
 					}
 
 					String id_equipo_str = messageTextFromTelegram.substring(0,
