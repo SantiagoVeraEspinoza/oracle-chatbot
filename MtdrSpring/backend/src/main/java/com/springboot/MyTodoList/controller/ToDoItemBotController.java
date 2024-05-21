@@ -42,6 +42,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private EquipoService equipoService;
 	private TareasService tareasService;
 	private String botName;
+	private Boolean tareaTitulo = true;
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
@@ -484,20 +485,49 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			else {
 				try {
-					//MODIFICADO PARA AÑADIR TAREAS A NUESTRA TABLA
-					Tareas newTarea = new Tareas();
-					newTarea.setTitulo("TITULO PRUEBA");
-					newTarea.setDescripcion(messageTextFromTelegram);
-					newTarea.setEstado("activa");
-					newTarea.setIdUsuario(chatId);
+					//Obtener todas las tareas
+					List<Tareas> tareas = getAllTareas();
 					
-					ResponseEntity entity = addTarea(newTarea);
+					//Obtenemos las tareas solo de este usuario
+					List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
+					.collect(Collectors.toList());
 
-					SendMessage messageToTelegram = new SendMessage();
-					messageToTelegram.setChatId(chatId);
-					messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+					//Si no hay uan tarea a medio ingresar a la que le falte descripción, insertar tarea nueva
 
-					execute(messageToTelegram);
+					if(tareaTitulo){
+						Tareas newTarea = new Tareas();
+						newTarea.setTitulo(messageTextFromTelegram);
+						newTarea.setDescripcion("temp desc");
+						newTarea.setEstado("activa");
+						newTarea.setIdUsuario(chatId);
+						ResponseEntity entity = addTarea(newTarea);
+						tareaTitulo = false;
+
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Titulo agregado, agrega una descripción a la tarea:");
+						//messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+						execute(messageToTelegram);
+					}else{
+						for (Tareas tar : thisUserTareas) {
+
+							if(tar.getDescripcion().equals("temp desc")){
+								Tareas newTarea = new Tareas();
+								//Actualziar descripcion de tarea 
+								//Tareas tarea = getTareaById(id).getBody();
+								tar.setDescripcion(messageTextFromTelegram);
+								updateTarea(tar, tar.getID());
+								
+								SendMessage messageToTelegram = new SendMessage();
+								messageToTelegram.setChatId(chatId);
+								messageToTelegram.setText("Tarea agregada correctamente");
+								execute(messageToTelegram);
+								tareaTitulo = true;
+								break;
+							}		
+						}
+					}
+
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
