@@ -412,11 +412,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				 		.collect(Collectors.toList());
 
 				for (Tareas tar : tareasActivas) {
-
-					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(tar.getDescripcion());
-					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
-					keyboard.add(currentRow);
+					if(!tar.getDescripcion().equals("temp desc")){
+						KeyboardRow currentRow = new KeyboardRow();
+						currentRow.add(tar.getDescripcion());
+						currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+						keyboard.add(currentRow);
+					}
 				}
 				//Obtenemos tareas finalizadas
 				List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada"))
@@ -442,14 +443,24 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				
 				messageBuilder.append("MIS TAREAS ACTIVAS").append("\n").append("\n");
 				
-				for (Tareas tar : tareasActivas) {
-					messageBuilder.append(tar.getTitulo()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+				if(tareasActivas.size() == 0){
+					messageBuilder.append("No tienes tareas activas...").append("\n").append("\n");
+				}else{
+					for (Tareas tar : tareasActivas) {
+						if(!tar.getDescripcion().equals("temp desc")){
+							messageBuilder .append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+						}
+					}
 				}
 
 				messageBuilder.append("MIS TAREAS FINALIZADAS").append("\n").append("\n");
 
-				for (Tareas tar : tareasFinalizadas) {
-					messageBuilder.append(tar.getTitulo()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+				if(tareasFinalizadas.size() == 0){
+					messageBuilder.append("No tienes tareas finalizadas...").append("\n").append("\n");
+				}else{
+					for (Tareas tar : tareasFinalizadas) {
+						messageBuilder.append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+					}
 				}
 
 				SendMessage messageToTelegram = new SendMessage();
@@ -467,9 +478,16 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
 				try {
+					
 					SendMessage messageToTelegram = new SendMessage();
 					messageToTelegram.setChatId(chatId);
-					messageToTelegram.setText(BotMessages.TYPE_NEW_TODO_ITEM.getMessage());
+					
+					if(tareaTitulo){
+						messageToTelegram.setText(BotMessages.TYPE_NEW_TODO_ITEM.getMessage());
+					}else{
+						messageToTelegram.setText("Antes de agregar una nueva tarea, agrega una descripción a la tarea que dejaste pendiente!");
+					}
+					
 					// hide keyboard
 					ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove(true);
 					messageToTelegram.setReplyMarkup(keyboardMarkup);
