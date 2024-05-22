@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  - name: DOCKER_REGISTRY
+    valueFrom: oci-secret
+    description: The secret value retrieved from OCI Vault
+
+steps:
+- name: RetrieveSecret
+    action: execute
+    commands:
+      - echo "Retrieving secret from OCI Vault..."
+      - SECRET_OCID="ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
+      - export DOCKER_REGISTRY=$(oci secrets secret-bundle get --secret-id "${SECRET_OCID}" --query 'data."secret-bundle-content"."content"' --raw-output | base64 --decode)
+      - echo "Secret retrieved and stored in environment variable DOCKER_REGISTRY"
+      - echo $DOCKER_REGISTRY
+
+  - name: BuildAndPackage
+    action: execute
+    commands:
+      - cd MtdrSpring/backend/
+      - mvn clean package spring-boot:repackage
+      - echo "Created build successfully"
+
+  - name: GenerateImage
+    action: execute
+    commands:
+      - echo "Test"
+
+artifacts:
+  primary:
+    files:
+      - target/*.jar
