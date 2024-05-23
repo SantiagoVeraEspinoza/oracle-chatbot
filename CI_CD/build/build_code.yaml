@@ -11,12 +11,8 @@ steps:
     command: |
       java -version
       yum install -y java-11-openjdk-devel
-      which java
-      ls -l /usr/bin/java
-      alternatives --display java
-      alternatives --query java
-      alternatives --query java | grep Alternative: | grep java-11 | awk '{print $2}'
-      JAVA_11_PATH=$(alternatives --query java | grep Alternative: | grep java-11 | awk '{print $2}')
+      JAVA_11_PATH=$(alternatives --display java | grep alt-java: | grep java-11 | awk '{print $2}')
+      echo $JAVA_11_PATH
       alternatives --set java "$JAVA_11_PATH"
       java -version
 
