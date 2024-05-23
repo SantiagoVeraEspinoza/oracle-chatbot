@@ -6,11 +6,17 @@ failImmediatelyOnError: true
 
 steps:
   - type: Command
+    name: "ResolveDependencies"
+    timeoutInSeconds: 600
+    command: |
+      java -version
+      sudo yum install java-11-openjdk-devel
+
+  - type: Command
     name: "BuildAndPackage"
     timeoutInSeconds: 600
     command: |
       cd MtdrSpring/backend/
-      java -version
       mvn clean package spring-boot:repackage
       echo "Created build successfully"
 
