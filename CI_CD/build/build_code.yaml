@@ -11,6 +11,8 @@ steps:
     command: |
       java -version
       yum install -y java-11-openjdk-devel
+      which java
+      java -version
 
   - type: Command
     name: "BuildAndPackage"
