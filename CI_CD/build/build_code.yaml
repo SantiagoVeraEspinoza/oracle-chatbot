@@ -36,7 +36,7 @@ steps:
   #   command: |
   #     echo "Test"
 
-outputArtifacts:
-  - name: MyTodoListApp
-    type: JAR
-    location: target/*.jar
+# outputArtifacts:
+#   - name: MyTodoListApp
+#     type: JAR
+#     location: target/*.jar
