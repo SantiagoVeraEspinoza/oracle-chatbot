@@ -7,7 +7,7 @@ failImmediatelyOnError: true
 env:
   variables:
   vaultVariables:
-    - DOCKER_REGISTRY: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
+    # - DOCKER_REGISTRY: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
   exportedVariables:
 
 steps:
@@ -18,7 +18,7 @@ steps:
       echo "Retrieving secret from OCI Vault..."
       # export DOCKER_REGISTRY=$(oci secrets secret-bundle get --secret-id "${DOCKER_RESGISTRY_SECRET_OCID}" --query 'data."secret-bundle-content"."content"' --raw-output | base64 --decode)
       # echo "Secret retrieved and stored in environment variable DOCKER_REGISTRY"
-      echo $DOCKER_REGISTRY
+      # echo $DOCKER_REGISTRY
 
   # - type: Command
   #   name: "BuildAndPackage"
