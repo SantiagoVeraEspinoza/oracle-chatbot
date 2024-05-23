@@ -27,6 +27,7 @@ steps:
     name: "GenerateImage"
     timeoutInSeconds: 600
     command: |
+      pwd
       docker build -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
 
 outputArtifacts:
