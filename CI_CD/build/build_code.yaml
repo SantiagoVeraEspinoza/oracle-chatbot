@@ -6,35 +6,30 @@ failImmediatelyOnError: true
 
 env:
   variables:
+    IMAGE_NAME: "todolistapp-springboot"
+    IMAGE_VERSION: "0.1"
   vaultVariables:
     DOCKER_REGISTRY: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
   exportedVariables:
+    - IMAGE
 
 steps:
   - type: Command
-    name: "RetrieveSecret"
-    timeoutInSeconds: 40
+    name: "BuildAndPackage"
+    timeoutInSeconds: 600
     command: |
-      echo "Retrieving secret from OCI Vault..."
-      # export DOCKER_REGISTRY=$(oci secrets secret-bundle get --secret-id "${DOCKER_RESGISTRY_SECRET_OCID}" --query 'data."secret-bundle-content"."content"' --raw-output | base64 --decode)
-      # echo "Secret retrieved and stored in environment variable DOCKER_REGISTRY"
-      echo $DOCKER_REGISTRY
+      cd MtdrSpring/backend/
+      mvn clean package spring-boot:repackage
+      echo "Created build successfully"
 
-  # - type: Command
-  #   name: "BuildAndPackage"
-  #   timeoutInSeconds: 600
-  #   command: |
-  #     cd MtdrSpring/backend/
-  #     mvn clean package spring-boot:repackage
-  #     echo "Created build successfully"
+  - type: Command
+    name: "GenerateImage"
+    timeoutInSeconds: 600
+    command: |
+      IMAGE=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_VERSION}
+      docker build -f Dockerfile -t "$IMAGE" .
 
-  # - type: Command
-  #   name: "GenerateImage"
-  #   timeoutInSeconds: 600
-  #   command: |
-  #     echo "Test"
-
-# outputArtifacts:
-#   - name: MyTodoListApp
-#     type: JAR
-#     location: target/*.jar
+outputArtifacts:
+  - name: MyTodoListAppImage
+    type: DOCKER_IMAGE
+    location: "$IMAGE"
