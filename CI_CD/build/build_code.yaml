@@ -14,8 +14,7 @@ steps:
       which java
       ls -l /usr/bin/java
       alternatives --display java
-      test=$(alternatives --display java)
-      echo $test
+      alternatives --query java
       alternatives --query java | grep Alternative: | grep java-11 | awk '{print $2}'
       JAVA_11_PATH=$(alternatives --query java | grep Alternative: | grep java-11 | awk '{print $2}')
       alternatives --set java "$JAVA_11_PATH"
