@@ -10,7 +10,8 @@ steps:
     timeoutInSeconds: 600
     command: |
       cd MtdrSpring/backend/
-      mvn clean package
+      java -version
+      mvn clean package spring-boot:repackage
       echo "Created build successfully"
 
   - type: Command
