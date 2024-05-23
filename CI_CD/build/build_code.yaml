@@ -18,7 +18,7 @@ steps:
       echo "Retrieving secret from OCI Vault..."
       # export DOCKER_REGISTRY=$(oci secrets secret-bundle get --secret-id "${DOCKER_RESGISTRY_SECRET_OCID}" --query 'data."secret-bundle-content"."content"' --raw-output | base64 --decode)
       # echo "Secret retrieved and stored in environment variable DOCKER_REGISTRY"
-      # echo $DOCKER_REGISTRY
+      echo $DOCKER_REGISTRY
 
   # - type: Command
   #   name: "BuildAndPackage"
