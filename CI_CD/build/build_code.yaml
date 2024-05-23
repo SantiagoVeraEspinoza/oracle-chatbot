@@ -10,7 +10,6 @@ failImmediatelyOnError: true
 #   vaultVariables:
 #     - DOCKER_RESGISTRY_SECRET_OCID: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
 #   exportedVariables:
-  
 
 steps:
   - type: Command
