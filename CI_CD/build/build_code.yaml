@@ -9,9 +9,7 @@ steps:
     name: "ResolveDependencies"
     timeoutInSeconds: 600
     command: |
-      java -version
       yum install -y java-11-openjdk-devel
-      alternatives --display java
       JAVA_11_PATH=$(alternatives --display java | grep "family java-11-openjdk.x86_64" | grep java-11 | awk '{print $1}')
       echo $JAVA_11_PATH
       alternatives --set java "$JAVA_11_PATH"
@@ -29,7 +27,7 @@ steps:
     name: "GenerateImage"
     timeoutInSeconds: 600
     command: |
-      docker build -f Dockerfile -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
+      docker build -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
 
 outputArtifacts:
   - name: MyTodoListAppImage
