@@ -7,7 +7,7 @@ env:
 
 steps:
 - name: RetrieveSecret
-    action: execute
+    action: Execute
     commands:
       - echo "Retrieving secret from OCI Vault..."
       - SECRET_OCID="ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
@@ -16,14 +16,14 @@ steps:
       - echo $DOCKER_REGISTRY
 
   - name: BuildAndPackage
-    action: execute
+    action: Execute
     commands:
       - cd MtdrSpring/backend/
       - mvn clean package spring-boot:repackage
       - echo "Created build successfully"
 
   - name: GenerateImage
-    action: execute
+    action: Execute
     commands:
       - echo "Test"
 
