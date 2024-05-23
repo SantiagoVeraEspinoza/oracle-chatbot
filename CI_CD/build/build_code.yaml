@@ -10,7 +10,7 @@ steps:
     timeoutInSeconds: 600
     command: |
       java -version
-      sudo yum install java-11-openjdk-devel
+      yum install java-11-openjdk-devel
 
   - type: Command
     name: "BuildAndPackage"
