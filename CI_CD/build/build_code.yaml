@@ -13,7 +13,7 @@ steps:
       yum install -y java-11-openjdk-devel
       which java
       ls -l /usr/bin/java
-      sudo alternatives --display java
+      alternatives --display java
       java -version
 
   - type: Command
