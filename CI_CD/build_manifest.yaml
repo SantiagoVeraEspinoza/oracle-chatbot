@@ -36,6 +36,6 @@ steps:
       cat todolistapp-springboot.yaml
 
 outputArtifacts:
-  - name: MyTodoListAppImage
+  - name: MyTodoListAppManifest
     type: BINARY
     location: todolistapp-springboot.yaml
