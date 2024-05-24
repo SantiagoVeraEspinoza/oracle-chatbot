@@ -28,7 +28,7 @@ steps:
     timeoutInSeconds: 600
     command: |
       cd MtdrSpring/backend/
-      docker build -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
+      docker build --platform linux/amd64 -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
 
 outputArtifacts:
   - name: MyTodoListAppImage
