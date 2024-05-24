@@ -6,10 +6,11 @@ failImmediatelyOnError: true
 
 env:
   variables:
-    IMAGE_NAME: "todolistapp-springboot"
-    IMAGE_VERSION: "0.1"
   vaultVariables:
     DOCKER_REGISTRY: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
+    TODO_PDB_NAME: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giazxtjvvvmeptuk6x5e5ug6oeldlxwpdqz4s5ov27xiqqq"
+    OCI_REGION: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaz4szl4eurmsq2sgoszixbo564u56ryebbf5uc25l7mna"
+    UI_USERNAME: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5gia2nfknzzja4pjlctu7tnaz4krfojfzrzphknvh347bgoa"
   exportedVariables:
 
 steps:
@@ -17,14 +18,21 @@ steps:
     name: "CopyManifest"
     timeoutInSeconds: 600
     command: |
-      ls
       cp MtdrSpring/backend/src/main/resources/todolistapp-springboot.yaml .
-      ls
 
   - type: Command
     name: "AdaptManifest"
     timeoutInSeconds: 600
     command: |
+      sed -i "s|%DOCKER_REGISTRY%|${DOCKER_REGISTRY}|g" todolistapp-springboot.yaml
+      sed -e "s|%DOCKER_REGISTRY%|${DOCKER_REGISTRY}|g" todolistapp-springboot.yaml > /tmp/todolistapp-springboot.yaml
+      mv -- /tmp/todolistapp-springboot.yaml todolistapp-springboot.yaml
+      sed -e "s|%TODO_PDB_NAME%|${TODO_PDB_NAME}|g" todolistapp-springboot.yaml > /tmp/todolistapp-springboot.yaml
+      mv -- /tmp/todolistapp-springboot.yaml todolistapp-springboot.yaml
+      sed -e "s|%OCI_REGION%|${OCI_REGION}|g" todolistapp-springboot.yaml > /tmp/todolistapp-springboot.yaml
+      mv -- /tmp/todolistapp-springboot.yaml todolistapp-springboot.yaml
+      sed -e "s|%UI_USERNAME%|${UI_USERNAME}|g" todolistapp-springboot.yaml > /tmp/todolistapp-springboot.yaml
+      mv -- /tmp/todolistapp-springboot.yaml todolistapp-springboot.yaml
       cat todolistapp-springboot.yaml
 
 outputArtifacts:
