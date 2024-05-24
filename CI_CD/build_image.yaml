@@ -31,7 +31,7 @@ steps:
     name: "GenerateImage"
     timeoutInSeconds: 600
     command: |
-      IMAGE_TAG=$(date)
+      IMAGE_TAG=$( date '+%F_%H.%M.%S' )
       cd MtdrSpring/backend/
       docker build -t todo-list-app .
 
