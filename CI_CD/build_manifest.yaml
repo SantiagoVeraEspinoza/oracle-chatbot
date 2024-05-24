@@ -17,7 +17,8 @@ steps:
     name: "CopyManifest"
     timeoutInSeconds: 600
     command: |
-      cp MtdrSpring/src/main/resources/todolistapp-springboot.yaml .
+      ls
+      cp MtdrSpring/backend/src/main/resources/todolistapp-springboot.yaml .
       ls
 
   - type: Command
