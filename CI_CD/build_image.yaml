@@ -4,6 +4,10 @@ timeoutInSeconds: 10000
 shell: bash
 failImmediatelyOnError: true
 
+env:
+  exportedVariables:
+    - IMAGE_TAG
+
 steps:
   - type: Command
     name: "ResolveDependencies"
@@ -27,10 +31,11 @@ steps:
     name: "GenerateImage"
     timeoutInSeconds: 600
     command: |
+      IMAGE_TAG=$(date)
       cd MtdrSpring/backend/
-      docker build --platform linux/amd64 -t qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1 .
+      docker build -t todo-list-app .
 
 outputArtifacts:
   - name: MyTodoListAppImage
     type: DOCKER_IMAGE
-    location: qro.ocir.io/axyjxetlpn8q/reacttodo/ga2ht/todolistapp-springboot:0.1
+    location: todo-list-app
