@@ -604,9 +604,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 							//get task of those users
 							for (Usuario currentUser : thisUserTeam) {
-								messageBuilder.append("--").append(currentUser.getNombre().toUpperCase()).append("--").append("\n").append("\n");
+								if(currentUser.getTipo_usuario().equals("developer")){
+									messageBuilder.append("--").append(currentUser.getNombre().toUpperCase()).append("--").append("\n").append("\n");
+								}
 								for(Tareas tar: tareas){
-									if(currentUser.getID_usuario() == tar.getIdUsuario()){
+									if(currentUser.getID_usuario() == tar.getIdUsuario() && currentUser.getTipo_usuario().equals("developer")){
 										messageBuilder.append(tar.getTitulo().toUpperCase()).append(" (").append(tar.getEstado()).append(")").append("\n");
 										messageBuilder.append(tar.getDescripcion()).append("\n").append("\n");
 									}
@@ -638,9 +640,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					List<Usuario> usuarios = getAllUsuarios();
 					List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
 
-					for (Usuario tar : thisUserTeam) {
+					for (Usuario usr : thisUserTeam) {
 						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add(usuario.getNombre());
+						currentRow.add(usr.getNombre());
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 						keyboard.add(currentRow);
