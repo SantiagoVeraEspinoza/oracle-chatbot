@@ -1,0 +1,32 @@
+version: 0.1
+component: build
+timeoutInSeconds: 10000
+shell: bash
+failImmediatelyOnError: true
+
+env:
+  variables:
+    IMAGE_NAME: "todolistapp-springboot"
+    IMAGE_VERSION: "0.1"
+  vaultVariables:
+    DOCKER_REGISTRY: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaqxn6ni4zsmthysgv7zw3ey5wwves6hqfz2iynckf7ela"
+  exportedVariables:
+
+steps:
+  - type: Command
+    name: "CopyManifest"
+    timeoutInSeconds: 600
+    command: |
+      cp MtdrSpring/src/main/resources/todolistapp-springboot.yaml .
+      ls
+
+  - type: Command
+    name: "AdaptManifest"
+    timeoutInSeconds: 600
+    command: |
+      cat todolistapp-springboot.yaml
+
+outputArtifacts:
+  - name: MyTodoListAppImage
+    type: BINARY
+    location: todolistapp-springboot.yaml
