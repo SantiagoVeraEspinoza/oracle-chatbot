@@ -628,6 +628,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}else if(messageTextFromTelegram.equals(BotLabels.TAREAS_UNA_PERSONA.getLabel())){
 					//VER TAREAS ACTIVAS Y FINALIZADAS POR PERSONA
 					// lISTAR EN MENU A LOS MIEMBROS DEL EQUIPO, MOSTRAR EN MENSAJE LAS TAREAS CON EL FORMATO DE ARRIBA, SE PUEDE SEPARAR COMO EL DEVELOPER THO
+					SendMessage messageToTelegram = new SendMessage();
+					messageToTelegram.setChatId(chatId);
+					messageToTelegram.setText("Mostrando lista de miembros del equipo");
+
+					ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+					List<KeyboardRow> keyboard = new ArrayList<>();
 
 					List<Usuario> usuarios = getAllUsuarios();
 					List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
@@ -638,6 +644,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 						keyboard.add(currentRow);
+					}
+
+					// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+					// Add the keyboard markup
+					messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+					try {
+						execute(messageToTelegram);
+					} catch (TelegramApiException e) {
+						logger.error(e.getLocalizedMessage(), e);
 					}
 				}
 			}
