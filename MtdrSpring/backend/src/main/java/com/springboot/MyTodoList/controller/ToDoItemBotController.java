@@ -641,15 +641,17 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
 
 					for (Usuario usr : thisUserTeam) {
-						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add(usr.getNombre());
+						if(usr.getTipo_usuario().equals("developer")){
+							KeyboardRow currentRow = new KeyboardRow();
+							currentRow.add(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID());
+							keyboard.add(currentRow);
+						}
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
 						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
-						keyboard.add(currentRow);
 					}
 
 					// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
+					keyboardMarkup.setKeyboard(keyboard);
 
 					// Add the keyboard markup
 					messageToTelegram.setReplyMarkup(keyboardMarkup);
@@ -659,6 +661,81 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} catch (TelegramApiException e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}
+
+				} else if (messageTextFromTelegram.indexOf(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel()) != -1) {
+					
+					String id_string = messageTextFromTelegram.substring(messageTextFromTelegram.length() - 10);
+					Integer id = Integer.valueOf(id_string);
+					Usuario user = getUsuarioById(id).getBody();
+
+					try {
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						// command back to main screen
+						KeyboardRow mainScreenRowTop = new KeyboardRow();
+						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						keyboard.add(mainScreenRowTop);
+						
+						keyboardMarkup.setKeyboard(keyboard);
+
+						List<Tareas> tareas = getAllTareas();
+
+						//Obtenemos tareas del usuario que queremos ver
+						List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == id)
+							.collect(Collectors.toList());
+
+						//Obtenemos las tareas activas
+						List<Tareas> tareasActivas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("activa"))
+							.collect(Collectors.toList());
+
+						//Obtenemos tareas finalizadas
+						List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada"))
+							.collect(Collectors.toList());
+						
+						//Mensaje con tus tareas y titulos 
+						StringBuilder messageBuilder = new StringBuilder();
+							
+						messageBuilder.append("TAREAS ACTIVAS DE ").append(user.getNombre().toUpperCase()).append("\n").append("\n");
+					
+						if(tareasActivas.size() == 0){
+							messageBuilder.append("Este developer no tiene tareas activas...").append("\n").append("\n");
+						}else{
+							for (Tareas tar : tareasActivas) {
+								if(!tar.getDescripcion().equals("temp desc")){
+									messageBuilder .append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+								}
+							}
+						}
+
+						messageBuilder.append("TAREAS FINALIZADAS DE ").append(user.getNombre().toUpperCase()).append("\n").append("\n");
+
+						if(tareasFinalizadas.size() == 0){
+							messageBuilder.append("Este developer no tiene tareas finalizadas...").append("\n").append("\n");
+						}else{
+							for (Tareas tar : tareasFinalizadas) {
+								messageBuilder.append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+							}
+						}
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}				
+							
+							
+
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							String message = messageBuilder.toString();
+							messageToTelegram.setText(message);
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+							try {
+								execute(messageToTelegram);
+							} catch (TelegramApiException e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
+
 				}
 			}
 		}

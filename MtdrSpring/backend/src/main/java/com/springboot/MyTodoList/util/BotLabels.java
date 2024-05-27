@@ -11,8 +11,10 @@ public enum BotLabels {
 	DELETE("DELETE"),
 	MY_TODO_LIST("MY TODO LIST"),
 	DASH("-"),
+	POINTS(": "),
 	TAREAS_MI_EQUIPO("Ver tareas de todo mi equipo"),
-	TAREAS_UNA_PERSONA("Ver tareas de un miembro del equipo");
+	TAREAS_UNA_PERSONA("Ver tareas de un miembro del equipo"),
+	VER_TAREAS_PERSON_SELECCIONADA("Tareas de");
 
 	private String label;
 
