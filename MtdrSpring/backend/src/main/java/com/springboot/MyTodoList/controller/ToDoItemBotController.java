@@ -643,11 +643,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					for (Usuario usr : thisUserTeam) {
 						if(usr.getTipo_usuario().equals("developer")){
 							KeyboardRow currentRow = new KeyboardRow();
-							currentRow.add(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID());
+							currentRow.add(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID_usuario());
 							keyboard.add(currentRow);
 						}
-						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-						//currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 					}
 
 					// Set the keyboard
@@ -718,24 +716,17 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 							}
 						}
 
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						String message = messageBuilder.toString();
+						messageToTelegram.setText(message);
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+						execute(messageToTelegram);
+
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}				
-							
-							
-
-							SendMessage messageToTelegram = new SendMessage();
-							messageToTelegram.setChatId(chatId);
-							String message = messageBuilder.toString();
-							messageToTelegram.setText(message);
-							messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-							try {
-								execute(messageToTelegram);
-							} catch (TelegramApiException e) {
-								logger.error(e.getLocalizedMessage(), e);
-							}
-
 				}
 			}
 		}
