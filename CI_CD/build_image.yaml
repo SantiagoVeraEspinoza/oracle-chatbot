@@ -13,7 +13,8 @@ steps:
     name: "ResolveDependencies"
     timeoutInSeconds: 600
     command: |
-      yum install -y java-11-openjdk-devel
+      yum list available java-11-openjdk-devel
+      yum install -y java-11-openjdk-devel-11.0.7.10-1.el7_7
       JAVA_11_PATH=$(alternatives --display java | grep "family java-11-openjdk.x86_64" | grep java-11 | awk '{print $1}')
       echo $JAVA_11_PATH
       alternatives --set java "$JAVA_11_PATH"
