@@ -33,7 +33,7 @@ steps:
     command: |
       IMAGE_TAG=$( date '+%F_%H.%M.%S' )
       cd MtdrSpring/backend/
-      docker build --platform linux/amd64,linux/arm64 -t todo-list-app .
+      docker build --platform=linux/aarch64 -f Dockerfile -t todo-list-app .
 
 outputArtifacts:
   - name: MyTodoListAppImage
