@@ -563,7 +563,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 				}
 			} else if(usuario.getTipo_usuario().equals("manager")){
-				
+				if(cambiarEquipo){
+					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
+					
+				}else
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
@@ -750,6 +753,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 					}				
+				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
+
+							modificarPerfil(chatId);
+							
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
+							
+							cambiarEquipo(chatId);
 				}
 			}
 		}
