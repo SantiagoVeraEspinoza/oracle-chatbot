@@ -44,6 +44,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private String botName;
 	private Boolean tareaTitulo = true;
 	private Boolean cambiarEquipo = false;
+	private Boolean cambiarNombre = false;
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
@@ -296,7 +297,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}
 
 			if(usuario.getTipo_usuario().equals("developer")){
-				
+				if(cambiandoNombre){
+					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
+
+				}else
 				if(cambiarEquipo){
 					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
 					
@@ -512,6 +516,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
 							
 							cambiarEquipo(chatId);
+							
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_NOMBRE.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
+						
+							cambiarNombre(chatId);
 				}
 				else {
 					try {
@@ -563,6 +572,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 				}
 			} else if(usuario.getTipo_usuario().equals("manager")){
+				if(cambiandoNombre){
+					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
+
+				}else
 				if(cambiarEquipo){
 					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
 					
@@ -762,8 +775,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
 							
 							cambiarEquipo(chatId);
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_NOMBRE.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
+						
+							cambiarNombre(chatId);
 				}
-			}
 		}
 	}
 
@@ -819,18 +835,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			KeyboardRow currentRow = new KeyboardRow();
 			currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
 			keyboard.add(currentRow);
-			}
+		}
 
-			// Set the keyboard
-			keyboardMarkup.setKeyboard(keyboard);
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
 
-			// Add the keyboard markup
-			messageToTelegram.setReplyMarkup(keyboardMarkup);
-			try{
-				execute(messageToTelegram);
-			}catch(Exception e){
-				logger.error(e.getLocalizedMessage(), e);
-			}		
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+		try{
+			execute(messageToTelegram);
+		}catch(Exception e){
+			logger.error(e.getLocalizedMessage(), e);
+		}		
 	}
 
 	public void cambiandoEquipo(String messageTextFromTelegram, Usuario usuario, long chatId){
@@ -843,35 +859,71 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			cambiarEquipo = false;
 
 			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
-			}catch(Exception e){
+		}catch(Exception e){
 						
-				SendMessage messageToTelegram = new SendMessage();
-				messageToTelegram.setChatId(chatId);
-				messageToTelegram.setText("Equipo no encontrado, seleccione un equipo valido: ");
+			SendMessage messageToTelegram = new SendMessage();
+			messageToTelegram.setChatId(chatId);
+			messageToTelegram.setText("Equipo no encontrado, seleccione un equipo valido: ");
 
-				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-				List<KeyboardRow> keyboard = new ArrayList<>();
+			ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+			List<KeyboardRow> keyboard = new ArrayList<>();
 
-				List<Equipo> equipos = getAllEquipos();
-				equipos.remove(0); // Remove the null team
+			List<Equipo> equipos = getAllEquipos();
+			equipos.remove(0); // Remove the null team
 
-				for (Equipo equipo : equipos) {
-						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
-						keyboard.add(currentRow);
-				}
-
-				// Set the keyboard
-				keyboardMarkup.setKeyboard(keyboard);
-
-				// Add the keyboard markup
-				messageToTelegram.setReplyMarkup(keyboardMarkup);
-				try{
-					execute(messageToTelegram);
-				}catch(Exception ex){
-					logger.error(ex.getLocalizedMessage(), ex);
-				}		
+			for (Equipo equipo : equipos) {
+					KeyboardRow currentRow = new KeyboardRow();
+					currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
+					keyboard.add(currentRow);
 			}
+
+			// Set the keyboard
+			keyboardMarkup.setKeyboard(keyboard);
+
+			// Add the keyboard markup
+			messageToTelegram.setReplyMarkup(keyboardMarkup);
+			try{
+				execute(messageToTelegram);
+			}catch(Exception ex){
+				logger.error(ex.getLocalizedMessage(), ex);
+			}		
+		}
+	}
+
+	public void cambiarNombre(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("Escriba su nuevo nombre: ");
+
+		cambiarNombre = true;
+
+		try{
+			execute(messageToTelegram);
+		}catch(Exception e){
+			logger.error(e.getLocalizedMessage(), e);
+		}		
+
+	}
+
+	public void cambiandoNombre(String messageTextFromTelegram, Usuario usuario, long chatId){
+		try{
+			usuario.setNombre(messageTextFromTelegram);
+			ResponseEntity entity = updateUsuario(usuario, chatId);
+			cambiarNombre = false;
+
+			BotHelper.sendMessageToTelegram(chatId, "Cambio de nombre completado!", this);
+		}catch(Exception e){
+						
+			SendMessage messageToTelegram = new SendMessage();
+			messageToTelegram.setChatId(chatId);
+			messageToTelegram.setText("Nombre no valido, escriba otro nombre: ");
+
+			try{
+				execute(messageToTelegram);
+			}catch(Exception ex){
+				logger.error(ex.getLocalizedMessage(), ex);
+			}		
+		}
 	}
 
 	@Override
