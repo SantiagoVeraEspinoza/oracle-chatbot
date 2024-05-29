@@ -5,6 +5,9 @@ shell: bash
 failImmediatelyOnError: true
 
 env:
+  vaultVariables:
+    TELEGRAM_USERNAME: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5gia22vr2p57zhvsblo5nxp37k37j7sc4fynrfv5mny2biva"
+    TELEGRAM_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaomen7ktjuxin3nmbydnfonamkvrwynpdvnevelf2uaiq"
   exportedVariables:
     - IMAGE_TAG
 
@@ -18,6 +21,15 @@ steps:
       echo $JAVA_11_PATH
       alternatives --set java "$JAVA_11_PATH"
       java -version
+
+  - type: Command
+    name: "InsertBotInfo"
+    timeoutInSeconds: 600
+    command: |
+      cd MtdrSpring/backend/src/main/resources/ 
+      cp application.properties.example application.properties
+      sed -i "s|<TelegramToken>|${TELEGRAM_TOKEN}|g" application.properties
+      sed -i "s|<TelegramUsername>|${TELEGRAM_USERNAME}|g" application.properties
 
   - type: Command
     name: "BuildAndPackage"
