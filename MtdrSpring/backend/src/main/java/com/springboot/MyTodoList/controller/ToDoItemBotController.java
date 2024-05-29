@@ -297,7 +297,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}
 
 			if(usuario.getTipo_usuario().equals("developer")){
-				if(cambiandoNombre){
+				if(cambiarNombre){
 					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
 
 				}else
@@ -572,7 +572,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 				}
 			} else if(usuario.getTipo_usuario().equals("manager")){
-				if(cambiandoNombre){
+				if(cambiarNombre){
 					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
 
 				}else
