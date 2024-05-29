@@ -36,9 +36,6 @@ steps:
     timeoutInSeconds: 600
     command: |
       cd MtdrSpring/backend/
-      git branch
-      git checkout dev-Tompkins-reborn
-      git pull --rebase
       mvn clean package spring-boot:repackage
       echo "Created build successfully"
 
@@ -49,6 +46,13 @@ steps:
       IMAGE_TAG=$( date '+%F_%H.%M.%S' )
       cd MtdrSpring/backend/
       docker build --platform=linux/aarch64 -f Dockerfile -t todo-list-app .
+
+  - type: Command
+    name: "UndeployKubernetes"
+    timeoutInSeconds: 600
+    command: |
+      kubectl -n mtdrworkshop delete deployment todolistapp-springboot-deployment
+      kubectl -n mtdrworkshop delete service todolistapp-springboot-service
 
 outputArtifacts:
   - name: MyTodoListAppImageCurrent
