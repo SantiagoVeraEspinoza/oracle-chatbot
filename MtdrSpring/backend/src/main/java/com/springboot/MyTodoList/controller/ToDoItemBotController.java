@@ -516,7 +516,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
 							
 							cambiarEquipo(chatId);
-							
+
 				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_NOMBRE.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
 						
@@ -780,6 +780,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						
 							cambiarNombre(chatId);
 				}
+			}
 		}
 	}
 
