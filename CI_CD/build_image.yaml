@@ -36,7 +36,8 @@ steps:
     timeoutInSeconds: 600
     command: |
       cd MtdrSpring/backend/
-      git pull
+      git pull --rebase
+      git branch
       mvn clean package spring-boot:repackage
       echo "Created build successfully"
 
