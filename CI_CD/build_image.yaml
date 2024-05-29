@@ -30,7 +30,6 @@ steps:
       cp application.properties.example application.properties
       sed -i "s|<TelegramToken>|${TELEGRAM_TOKEN}|g" application.properties
       sed -i "s|<TelegramUsername>|${TELEGRAM_USERNAME}|g" application.properties
-      cat  application.properties
 
   - type: Command
     name: "BuildAndPackage"
@@ -49,6 +48,9 @@ steps:
       docker build --platform=linux/aarch64 -f Dockerfile -t todo-list-app .
 
 outputArtifacts:
-  - name: MyTodoListAppImage
+  - name: MyTodoListAppImageCurrent
+    type: DOCKER_IMAGE
+    location: todo-list-app
+  - name: MyTodoListAppImageLatest
     type: DOCKER_IMAGE
     location: todo-list-app
