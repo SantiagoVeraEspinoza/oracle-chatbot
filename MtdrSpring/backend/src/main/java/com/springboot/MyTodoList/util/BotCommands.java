@@ -6,7 +6,10 @@ public enum BotCommands {
 	HIDE_COMMAND("/hide"), 
 	TODO_LIST("/todolist"),
 	ADD_ITEM("/additem"),
-	TAREAS_MI_EQUIPO("/teamtasks");
+	TAREAS_MI_EQUIPO("/teamtasks"),
+	MODIFICAR_PERFIL("/perfil"),
+	CAMBIAR_EQUIPO("/equipo"),
+	CAMBIAR_NOMBRE("/nombre");
 
 	private String command;
 
