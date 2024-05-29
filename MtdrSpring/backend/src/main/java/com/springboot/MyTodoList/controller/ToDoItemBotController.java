@@ -332,8 +332,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						messageToTelegram.setReplyMarkup(keyboardMarkup);
 						try{
 							execute(messageToTelegram);
-						}catch(Exception e){
-							logger.error(e.getLocalizedMessage(), e);
+						}catch(Exception ex){
+							logger.error(ex.getLocalizedMessage(), ex);
 						}		
 					}
 					
