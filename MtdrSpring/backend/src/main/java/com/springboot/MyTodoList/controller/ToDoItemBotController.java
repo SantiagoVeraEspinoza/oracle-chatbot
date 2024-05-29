@@ -298,44 +298,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			if(usuario.getTipo_usuario().equals("developer")){
 				
 				if(cambiarEquipo){
-					try{
-						String id_string = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-						Integer id_newTeam = Integer.valueOf(id_string);
-
-						usuario.setID_equipo(id_newTeam);
-						ResponseEntity entity = updateUsuario(usuario, chatId);
-						cambiarEquipo = false;
-
-						BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
-					}catch(Exception e){
-						
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Equipo no encontrado, seleccione un equipo valido: ");
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						List<Equipo> equipos = getAllEquipos();
-						equipos.remove(0); // Remove the null team
-
-						for (Equipo equipo : equipos) {
-							KeyboardRow currentRow = new KeyboardRow();
-							currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
-							keyboard.add(currentRow);
-						}
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						try{
-							execute(messageToTelegram);
-						}catch(Exception ex){
-							logger.error(ex.getLocalizedMessage(), ex);
-						}		
-					}
+					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
 					
 				}else
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
@@ -542,68 +505,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
-							SendMessage messageToTelegram = new SendMessage();
-							messageToTelegram.setChatId(chatId);
-							messageToTelegram.setText("¿Qué quieres modificar?");
 
-							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-							List<KeyboardRow> keyboard = new ArrayList<>();
-
-							// first row
-							KeyboardRow row = new KeyboardRow();
-							row.add(BotLabels.CAMBIAR_EQUIPO.getLabel());
-							row.add(BotLabels.CAMBIAR_NOMBRE.getLabel());
-							// Add the first row to the keyboard
-							keyboard.add(row);
-
-							// second row
-							row = new KeyboardRow();
-							row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-							row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
-							keyboard.add(row);
-
-							// Set the keyboard
-							keyboardMarkup.setKeyboard(keyboard);
-
-							// Add the keyboard markup
-							messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-							try {
-								execute(messageToTelegram);
-							} catch (TelegramApiException e) {
-								logger.error(e.getLocalizedMessage(), e);
-							}
-
+							modificarPerfil(chatId);
+							
 				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
-							SendMessage messageToTelegram = new SendMessage();
-							messageToTelegram.setChatId(chatId);
-							messageToTelegram.setText("Seleccione su nuevo equipo: ");
-
-							cambiarEquipo = true;
-
-							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-							List<KeyboardRow> keyboard = new ArrayList<>();
-
-							List<Equipo> equipos = getAllEquipos();
-							equipos.remove(0); // Remove the null team
-
-							for (Equipo equipo : equipos) {
-								KeyboardRow currentRow = new KeyboardRow();
-								currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
-								keyboard.add(currentRow);
-							}
-
-							// Set the keyboard
-							keyboardMarkup.setKeyboard(keyboard);
-
-							// Add the keyboard markup
-							messageToTelegram.setReplyMarkup(keyboardMarkup);
-							try{
-								execute(messageToTelegram);
-							}catch(Exception e){
-								logger.error(e.getLocalizedMessage(), e);
-							}		
+							
+							cambiarEquipo(chatId);
 				}
 				else {
 					try {
@@ -845,6 +753,113 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 			}
 		}
+	}
+
+
+	public void modificarPerfil(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("¿Qué quieres modificar?");
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		// first row
+		KeyboardRow row = new KeyboardRow();
+		row.add(BotLabels.CAMBIAR_EQUIPO.getLabel());
+		row.add(BotLabels.CAMBIAR_NOMBRE.getLabel());
+		// Add the first row to the keyboard
+		keyboard.add(row);
+
+		// second row
+		row = new KeyboardRow();
+		row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+		row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+		keyboard.add(row);
+
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
+
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+		try {
+			execute(messageToTelegram);
+		} catch (TelegramApiException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
+
+	public void cambiarEquipo(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("Seleccione su nuevo equipo: ");
+
+		cambiarEquipo = true;
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		List<Equipo> equipos = getAllEquipos();
+		equipos.remove(0); // Remove the null team
+
+		for (Equipo equipo : equipos) {
+			KeyboardRow currentRow = new KeyboardRow();
+			currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
+			keyboard.add(currentRow);
+			}
+
+			// Set the keyboard
+			keyboardMarkup.setKeyboard(keyboard);
+
+			// Add the keyboard markup
+			messageToTelegram.setReplyMarkup(keyboardMarkup);
+			try{
+				execute(messageToTelegram);
+			}catch(Exception e){
+				logger.error(e.getLocalizedMessage(), e);
+			}		
+	}
+
+	public void cambiandoEquipo(String messageTextFromTelegram, Usuario usuario, long chatId){
+		try{
+			String id_string = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+			Integer id_newTeam = Integer.valueOf(id_string);
+
+			usuario.setID_equipo(id_newTeam);
+			ResponseEntity entity = updateUsuario(usuario, chatId);
+			cambiarEquipo = false;
+
+			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
+			}catch(Exception e){
+						
+				SendMessage messageToTelegram = new SendMessage();
+				messageToTelegram.setChatId(chatId);
+				messageToTelegram.setText("Equipo no encontrado, seleccione un equipo valido: ");
+
+				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+				List<KeyboardRow> keyboard = new ArrayList<>();
+
+				List<Equipo> equipos = getAllEquipos();
+				equipos.remove(0); // Remove the null team
+
+				for (Equipo equipo : equipos) {
+						KeyboardRow currentRow = new KeyboardRow();
+						currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
+						keyboard.add(currentRow);
+				}
+
+				// Set the keyboard
+				keyboardMarkup.setKeyboard(keyboard);
+
+				// Add the keyboard markup
+				messageToTelegram.setReplyMarkup(keyboardMarkup);
+				try{
+					execute(messageToTelegram);
+				}catch(Exception ex){
+					logger.error(ex.getLocalizedMessage(), ex);
+				}		
+			}
 	}
 
 	@Override
