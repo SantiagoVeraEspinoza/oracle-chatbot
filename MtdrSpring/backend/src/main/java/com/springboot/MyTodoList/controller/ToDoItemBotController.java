@@ -305,7 +305,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			if(usuario.getTipo_usuario().equals("developer")){
 				if(cambiarNombre){
-					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
+					cambiandoNombre(messageTextFromTelegram, usuario, chatId)
 
 				}else
 				if(cambiarEquipo){
