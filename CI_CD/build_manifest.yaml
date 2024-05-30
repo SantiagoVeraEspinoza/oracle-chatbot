@@ -15,7 +15,7 @@ env:
   exportedVariables:
 
 steps:
-- type: Command
+  - type: Command
     name: "GenerateImageTag"
     timeoutInSeconds: 600
     command: |
