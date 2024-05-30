@@ -528,6 +528,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 									messageToTelegram.setChatId(chatId);
 									messageToTelegram.setText("Tarea agregada correctamente");
 									execute(messageToTelegram);
+									mainMenuDeveloper(chatId, BotMessages.SELECCION_MENU.getMessage());
 									tareaTitulo = true;
 									break;
 								}		
@@ -641,12 +642,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
 
-						// command back to main screen
-						KeyboardRow mainScreenRowTop = new KeyboardRow();
-						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-						keyboard.add(mainScreenRowTop);
+						// // command back to main screen
+						// KeyboardRow mainScreenRowTop = new KeyboardRow();
+						// mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						// keyboard.add(mainScreenRowTop);
 						
-						keyboardMarkup.setKeyboard(keyboard);
+						// keyboardMarkup.setKeyboard(keyboard);
 
 						List<Tareas> tareas = getAllTareas();
 
@@ -691,9 +692,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						messageToTelegram.setChatId(chatId);
 						String message = messageBuilder.toString();
 						messageToTelegram.setText(message);
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
+						//messageToTelegram.setReplyMarkup(keyboardMarkup);
 
 						execute(messageToTelegram);
+						mainMenuManager(chatId, BotMessages.SELECCION_MENU.getMessage());
 
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
@@ -781,10 +783,29 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	}
 
 
-	public void modificarPerfil(long chatId){
+	public void modificarPerfil(long chatId, Usuario usuario){
+		
 		SendMessage messageToTelegram = new SendMessage();
 		messageToTelegram.setChatId(chatId);
-		messageToTelegram.setText("¿Qué quieres modificar?");
+		
+		Equipo equipo = getEquiposById(usuario.getID_equipo()).getBody();
+		
+		StringBuilder messageBuilder = new StringBuilder();				
+		messageBuilder.append("INFORMACIÓN DE PERFIL DE USUARIO").append("\n").append("\n");
+		messageBuilder.append("NOMBRE: ").append(usuario.getNombre()).append("\n");
+		messageBuilder.append("EQUIPO: ").append(equipo.getNombre()).append("\n");
+
+		messageToTelegram.setText(messageBuilder.toString());
+
+		try {
+			execute(messageToTelegram);
+		} catch (TelegramApiException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+		
+		SendMessage messageToTelegram2 = new SendMessage();
+		messageToTelegram2.setChatId(chatId);
+		messageToTelegram2.setText("¿Qué quieres modificar?");
 
 		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 		List<KeyboardRow> keyboard = new ArrayList<>();
@@ -806,12 +827,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		keyboardMarkup.setKeyboard(keyboard);
 
 		// Add the keyboard markup
-		messageToTelegram.setReplyMarkup(keyboardMarkup);
+		messageToTelegram2.setReplyMarkup(keyboardMarkup);
 
 		try {
-			execute(messageToTelegram);
-		} catch (TelegramApiException e) {
-			logger.error(e.getLocalizedMessage(), e);
+			execute(messageToTelegram2);
+		} catch (TelegramApiException ex) {
+			logger.error(e.getLocalizedMessage(), ex);
 		}
 	}
 
