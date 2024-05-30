@@ -12,7 +12,7 @@ env:
     - IMAGE_TAG
 
 steps:
-- type: Command
+  - type: Command
     name: "GenerateImageTag"
     timeoutInSeconds: 600
     command: |
