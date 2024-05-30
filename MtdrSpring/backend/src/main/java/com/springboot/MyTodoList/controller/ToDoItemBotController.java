@@ -606,6 +606,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 						row = new KeyboardRow();
 						row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
+						row.add(BotLabels.CAMBIAR_ROL.getLabel());
 						keyboard.add(row);
 
 						// Set the keyboard
@@ -779,6 +780,63 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
 						
 							cambiarNombre(chatId);
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_ROL.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_ROL.getLabel())){
+							
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Mostrando lista de miembros del equipo, ¿A qué developer quieres convertir a Manager?");
+
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							List<Usuario> usuarios = getAllUsuarios();
+							List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
+
+							for (Usuario usr : thisUserTeam) {
+								if(usr.getTipo_usuario().equals("developer")){
+									KeyboardRow currentRow = new KeyboardRow();
+									currentRow.add(BotLabels.CAMBIAR_ROL_PERSONA_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID_usuario());
+									keyboard.add(currentRow);
+								}
+							}
+
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+							try {
+								execute(messageToTelegram);
+							} catch (TelegramApiException e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
+
+				}else if(messageTextFromTelegram.indexOf(BotLabels.CAMBIAR_ROL_PERSONA_SELECCIONADA.getLabel()) != -1){
+					String id_string = messageTextFromTelegram.substring(messageTextFromTelegram.length() - 10);
+					Integer id = Integer.valueOf(id_string);
+					Usuario user = getUsuarioById(id).getBody();
+
+					try {
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						// command back to main screen
+						KeyboardRow mainScreenRowTop = new KeyboardRow();
+						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						keyboard.add(mainScreenRowTop);
+						
+						keyboardMarkup.setKeyboard(keyboard);
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+						user.setTipo_usuario("manager");
+						ResponseEntity entity = updateUsuario(user, user.getID_usuario());
+						BotHelper.sendMessageToTelegram(chatId, "Usuario convertido a manager!", this);
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}				
 				}
 			}
 		}

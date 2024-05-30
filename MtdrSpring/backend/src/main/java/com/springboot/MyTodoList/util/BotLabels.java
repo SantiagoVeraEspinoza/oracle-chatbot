@@ -15,9 +15,11 @@ public enum BotLabels {
 	TAREAS_MI_EQUIPO("Ver tareas de todo mi equipo"),
 	TAREAS_UNA_PERSONA("Ver tareas de un miembro del equipo"),
 	VER_TAREAS_PERSON_SELECCIONADA("Tareas de"),
+	CAMBIAR_ROL_PERSONA_SELECCIONADA("Cambiar rol de"),
 	MODIFICAR_PERFIL("Modificar Perfil"),
 	CAMBIAR_EQUIPO("Cambiar de Equipo"),
-	CAMBIAR_NOMBRE("Cambiar de nombre");
+	CAMBIAR_NOMBRE("Cambiar de nombre"),
+	CAMBIAR_ROL("Cambiar rol de un miembro del equipo");
 
 	private String label;
 

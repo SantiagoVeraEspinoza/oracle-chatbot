@@ -9,7 +9,8 @@ public enum BotCommands {
 	TAREAS_MI_EQUIPO("/teamtasks"),
 	MODIFICAR_PERFIL("/perfil"),
 	CAMBIAR_EQUIPO("/equipo"),
-	CAMBIAR_NOMBRE("/nombre");
+	CAMBIAR_NOMBRE("/nombre"),
+	CAMBIAR_ROL("/rol");
 
 	private String command;
 
