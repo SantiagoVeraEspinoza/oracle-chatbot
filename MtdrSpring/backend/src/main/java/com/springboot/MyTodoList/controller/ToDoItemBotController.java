@@ -315,7 +315,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
-						mainMenuDeveloper(chatId);
+						//mainMenuDeveloper(chatId);
 						
 				} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
 					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
@@ -557,7 +557,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
-						mainMenuManager(chatId);
+						//mainMenuManager(chatId);
 
 				} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
@@ -702,7 +702,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 						execute(messageToTelegram);
 
-						mainMenuDeveloper(chatId);
+						//mainMenuDeveloper(chatId);
 
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
@@ -864,11 +864,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			ResponseEntity entity = updateUsuario(usuario, chatId);
 			cambiarEquipo = false;
 
-			if(usuario.getTipo_usuario().equals("developer")){
-				mainMenuDeveloper(chatId);
-			}else{
-				mainMenuManager(chatId);
-			}
+			// if(usuario.getTipo_usuario().equals("developer")){
+			// 	mainMenuDeveloper(chatId);
+			// }else{
+			// 	mainMenuManager(chatId);
+			// }
 
 			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
 		
