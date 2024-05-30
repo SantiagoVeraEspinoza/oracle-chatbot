@@ -307,41 +307,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}else
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						// first row
-						KeyboardRow row = new KeyboardRow();
-						row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
-						row.add(BotLabels.ADD_NEW_ITEM.getLabel());
-						// Add the first row to the keyboard
-						keyboard.add(row);
-
-						// second row
-						row = new KeyboardRow();
-						row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-						row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
-						keyboard.add(row);
-
-						row = new KeyboardRow();
-						row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
-						keyboard.add(row);
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-						try {
-							execute(messageToTelegram);
-						} catch (TelegramApiException e) {
-							logger.error(e.getLocalizedMessage(), e);
-						}
+						
+						mainMenuDeveloper(chatId);
 
 				} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
 					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
@@ -583,43 +550,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						// first row
-						KeyboardRow row = new KeyboardRow();
-
-						row.add(BotLabels.TAREAS_MI_EQUIPO.getLabel());
-						row.add(BotLabels.TAREAS_UNA_PERSONA.getLabel());
-						// Add the first row to the keyboard
-						keyboard.add(row);
-
-						// second row
-						row = new KeyboardRow();
-						row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-						row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
-						keyboard.add(row);
-
-						row = new KeyboardRow();
-						row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
-						row.add(BotLabels.CAMBIAR_ROL.getLabel());
-						keyboard.add(row);
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-						try {
-							execute(messageToTelegram);
-						} catch (TelegramApiException e) {
-							logger.error(e.getLocalizedMessage(), e);
-						}
+						mainMenuManager(chatId);
 
 				} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
@@ -924,6 +855,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			ResponseEntity entity = updateUsuario(usuario, chatId);
 			cambiarEquipo = false;
 
+			if(usuario.getTipo_usuario().equals("developer")){
+				mainMenuDeveloper(chatId);
+			}else{
+				mainMenuManager(chatId);
+			}
+
 			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
 		}catch(Exception e){
 						
@@ -989,6 +926,84 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}catch(Exception ex){
 				logger.error(ex.getLocalizedMessage(), ex);
 			}		
+		}
+	}
+
+	public void mainMenuDeveloper(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText(BotMessages.HELLO_DEVELOPER.getMessage());
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		// first row
+		KeyboardRow row = new KeyboardRow();
+		row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
+		row.add(BotLabels.ADD_NEW_ITEM.getLabel());
+		// Add the first row to the keyboard
+		keyboard.add(row);
+
+		// second row
+		row = new KeyboardRow();
+		row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+		row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+		keyboard.add(row);
+
+		row = new KeyboardRow();
+		row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
+		keyboard.add(row);
+
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
+
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+		try {
+			execute(messageToTelegram);
+		} catch (TelegramApiException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
+
+	public void mainMenuManager(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText(BotMessages.HELLO_MANAGER.getMessage());
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		// first row
+		KeyboardRow row = new KeyboardRow();
+
+		row.add(BotLabels.TAREAS_MI_EQUIPO.getLabel());
+		row.add(BotLabels.TAREAS_UNA_PERSONA.getLabel());
+		// Add the first row to the keyboard
+		keyboard.add(row);
+
+		// second row
+		row = new KeyboardRow();
+		row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+		row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+		keyboard.add(row);
+
+		row = new KeyboardRow();
+		row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
+		row.add(BotLabels.CAMBIAR_ROL.getLabel());
+		keyboard.add(row);
+
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
+
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+		try {
+			execute(messageToTelegram);
+		} catch (TelegramApiException e) {
+			logger.error(e.getLocalizedMessage(), e);
 		}
 	}
 
