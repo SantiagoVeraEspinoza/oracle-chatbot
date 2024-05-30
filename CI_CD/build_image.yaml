@@ -12,6 +12,12 @@ env:
     - IMAGE_TAG
 
 steps:
+- type: Command
+    name: "GenerateImageTag"
+    timeoutInSeconds: 600
+    command: |
+      IMAGE_TAG=$(echo ${OCI_BUILD_RUN_ID} | rev | cut -c 1-7)
+
   - type: Command
     name: "ResolveDependencies"
     timeoutInSeconds: 600
@@ -43,14 +49,10 @@ steps:
     name: "GenerateImage"
     timeoutInSeconds: 600
     command: |
-      IMAGE_TAG=$( date '+%F_%H.%M.%S' )
       cd MtdrSpring/backend/
       docker build --platform=linux/aarch64 -f Dockerfile -t todo-list-app .
 
 outputArtifacts:
-  - name: MyTodoListAppImageCurrent
-    type: DOCKER_IMAGE
-    location: todo-list-app
-  - name: MyTodoListAppImageLatest
+  - name: MyTodoListAppImage
     type: DOCKER_IMAGE
     location: todo-list-app
