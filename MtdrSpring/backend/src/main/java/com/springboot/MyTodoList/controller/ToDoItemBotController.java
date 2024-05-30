@@ -318,7 +318,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						//mainMenuDeveloper(chatId);
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText(BotMessages.HELLO_DEVELOPER.getMessage());
+						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
 
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
@@ -595,7 +595,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						//mainMenuManager(chatId);
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText(BotMessages.HELLO_MANAGER.getMessage());
+						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
 
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
@@ -717,15 +717,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					Usuario user = getUsuarioById(id).getBody();
 
 					try {
-						// ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						// List<KeyboardRow> keyboard = new ArrayList<>();
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
 
-						// // command back to main screen
-						// KeyboardRow mainScreenRowTop = new KeyboardRow();
-						// mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-						// keyboard.add(mainScreenRowTop);
+						// command back to main screen
+						KeyboardRow mainScreenRowTop = new KeyboardRow();
+						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						keyboard.add(mainScreenRowTop);
 						
-						// keyboardMarkup.setKeyboard(keyboard);
+						keyboardMarkup.setKeyboard(keyboard);
 
 						List<Tareas> tareas = getAllTareas();
 
