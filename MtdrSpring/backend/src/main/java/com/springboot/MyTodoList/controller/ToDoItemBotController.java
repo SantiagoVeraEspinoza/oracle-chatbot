@@ -819,6 +819,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					Usuario user = getUsuarioById(id).getBody();
 
 					try {
+						
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Usuario convertido a manager!");
+
+
 						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 						List<KeyboardRow> keyboard = new ArrayList<>();
 
@@ -832,7 +838,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 						user.setTipo_usuario("manager");
 						ResponseEntity entity = updateUsuario(user, user.getID_usuario());
-						BotHelper.sendMessageToTelegram(chatId, "Usuario convertido a manager!", this);
+
+						execute(messageToTelegram);
 
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
