@@ -1,0 +1,58 @@
+version: 0.1
+component: build
+timeoutInSeconds: 10000
+shell: bash
+failImmediatelyOnError: true
+
+env:
+  vaultVariables:
+    TELEGRAM_USERNAME: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5gia22vr2p57zhvsblo5nxp37k37j7sc4fynrfv5mny2biva"
+    TELEGRAM_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaaal4j5giaomen7ktjuxin3nmbydnfonamkvrwynpdvnevelf2uaiq"
+  exportedVariables:
+    - IMAGE_TAG
+
+steps:
+  - type: Command
+    name: "GenerateImageTag"
+    timeoutInSeconds: 600
+    command: |
+      IMAGE_TAG=$(echo ${OCI_BUILD_RUN_ID} | rev | cut -c 1-7)
+
+  - type: Command
+    name: "ResolveDependencies"
+    timeoutInSeconds: 600
+    command: |
+      yum install -y java-11-openjdk-devel
+      JAVA_11_PATH=$(alternatives --display java | grep "family java-11-openjdk.x86_64" | grep java-11 | awk '{print $1}')
+      echo $JAVA_11_PATH
+      alternatives --set java "$JAVA_11_PATH"
+      java -version
+
+  - type: Command
+    name: "InsertBotInfo"
+    timeoutInSeconds: 600
+    command: |
+      cd MtdrSpring/backend/src/main/resources/ 
+      cp application.properties.example application.properties
+      sed -i "s|<TelegramToken>|${TELEGRAM_TOKEN}|g" application.properties
+      sed -i "s|<TelegramUsername>|${TELEGRAM_USERNAME}|g" application.properties
+
+  - type: Command
+    name: "BuildAndPackage"
+    timeoutInSeconds: 600
+    command: |
+      cd MtdrSpring/backend/
+      mvn clean package spring-boot:repackage
+      echo "Created build successfully"
+
+  - type: Command
+    name: "GenerateImage"
+    timeoutInSeconds: 600
+    command: |
+      cd MtdrSpring/backend/
+      docker build --platform=linux/aarch64 -f Dockerfile -t todo-list-app .
+
+outputArtifacts:
+  - name: MyTodoListAppImage
+    type: DOCKER_IMAGE
+    location: todo-list-app

@@ -43,6 +43,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private TareasService tareasService;
 	private String botName;
 	private Boolean tareaTitulo = true;
+	private Boolean cambiarEquipo = false;
+	private Boolean cambiarNombre = false;
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
@@ -293,263 +295,700 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					return;
 				}
 			}
-			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
-				SendMessage messageToTelegram = new SendMessage();
-				messageToTelegram.setChatId(chatId);
-				messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
 
-				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-				List<KeyboardRow> keyboard = new ArrayList<>();
+			if(usuario.getTipo_usuario().equals("developer")){
+				if(cambiarNombre){
+					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
 
-				// first row
-				KeyboardRow row = new KeyboardRow();
-				row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
-				row.add(BotLabels.ADD_NEW_ITEM.getLabel());
-				// Add the first row to the keyboard
-				keyboard.add(row);
-
-				// second row
-				row = new KeyboardRow();
-				row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
-				keyboard.add(row);
-
-				// Set the keyboard
-				keyboardMarkup.setKeyboard(keyboard);
-
-				// Add the keyboard markup
-				messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-				try {
-					execute(messageToTelegram);
-				} catch (TelegramApiException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
-
-				String done = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(done);
-
-				try {
-
-					Tareas tarea = getTareaById(id).getBody();
-					tarea.setEstado("finalizada");
-					updateTarea(tarea, id);
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
-
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			} else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
-
-				String undo = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(undo);
-
-				try {
-
-					Tareas tarea = getTareaById(id).getBody();
-					tarea.setEstado("activa");
-					updateTarea(tarea, id);
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
-
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			} else if (messageTextFromTelegram.indexOf(BotLabels.DELETE.getLabel()) != -1) {
-
-				String delete = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(delete);
-
-				try {
-
-					deleteTarea(id).getBody();
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DELETED.getMessage(), this);
-
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
-
-				BotHelper.sendMessageToTelegram(chatId, BotMessages.BYE.getMessage(), this);
-
-			} else if (messageTextFromTelegram.equals(BotCommands.TODO_LIST.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.LIST_ALL_ITEMS.getLabel())
-					|| messageTextFromTelegram.equals(BotLabels.MY_TODO_LIST.getLabel())) {
-
-						//Obtenemos todas las tareas
-				List<Tareas> tareas = getAllTareas();
-				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-				List<KeyboardRow> keyboard = new ArrayList<>();
-
-				// command back to main screen
-				KeyboardRow mainScreenRowTop = new KeyboardRow();
-				mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				keyboard.add(mainScreenRowTop);
-
-				KeyboardRow firstRow = new KeyboardRow();
-				firstRow.add(BotLabels.ADD_NEW_ITEM.getLabel());
-				keyboard.add(firstRow);
-
-				KeyboardRow myTodoListTitleRow = new KeyboardRow();
-				myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
-				keyboard.add(myTodoListTitleRow);
-
-				//Obtenemos las tareas solo de este usuario
-				List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
-				 		.collect(Collectors.toList());
-				
-				//Obtenemos las tareas activas
-				List<Tareas> tareasActivas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("activa"))
-				 		.collect(Collectors.toList());
-
-				for (Tareas tar : tareasActivas) {
-					if(!tar.getDescripcion().equals("temp desc")){
-						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add(tar.getDescripcion());
-						currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
-						keyboard.add(currentRow);
-					}
-				}
-				//Obtenemos tareas finalizadas
-				List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada"))
-				 		.collect(Collectors.toList());
-
-				for (Tareas tar : tareasFinalizadas) {
-					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(tar.getDescripcion());
-					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
-					keyboard.add(currentRow);
-				}
-
-				// command back to main screen
-				KeyboardRow mainScreenRowBottom = new KeyboardRow();
-				mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				keyboard.add(mainScreenRowBottom);
-
-				keyboardMarkup.setKeyboard(keyboard);
-
-				//Mensaje con tus tareas y titulos 
-				StringBuilder messageBuilder = new StringBuilder();
-				
-				messageBuilder.append("MIS TAREAS ACTIVAS").append("\n").append("\n");
-				
-				if(tareasActivas.size() == 0){
-					messageBuilder.append("No tienes tareas activas...").append("\n").append("\n");
-				}else{
-					for (Tareas tar : tareasActivas) {
-						if(!tar.getDescripcion().equals("temp desc")){
-							messageBuilder .append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
-						}
-					}
-				}
-
-				messageBuilder.append("MIS TAREAS FINALIZADAS").append("\n").append("\n");
-
-				if(tareasFinalizadas.size() == 0){
-					messageBuilder.append("No tienes tareas finalizadas...").append("\n").append("\n");
-				}else{
-					for (Tareas tar : tareasFinalizadas) {
-						messageBuilder.append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
-					}
-				}
-
-				SendMessage messageToTelegram = new SendMessage();
-				messageToTelegram.setChatId(chatId);
-				String message = messageBuilder.toString();
-				messageToTelegram.setText(message);
-				messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-				try {
-					execute(messageToTelegram);
-				} catch (TelegramApiException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
-				try {
+				}else
+				if(cambiarEquipo){
+					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
 					
+				}else
+				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
+					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						// first row
+						KeyboardRow row = new KeyboardRow();
+						row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
+						row.add(BotLabels.ADD_NEW_ITEM.getLabel());
+						// Add the first row to the keyboard
+						keyboard.add(row);
+
+						// second row
+						row = new KeyboardRow();
+						row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+						keyboard.add(row);
+
+						row = new KeyboardRow();
+						row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
+						keyboard.add(row);
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException e) {
+							logger.error(e.getLocalizedMessage(), e);
+						}
+
+				} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
+					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(done);
+					
+					try {
+						Tareas tarea = getTareaById(id).getBody();
+						tarea.setEstado("finalizada");
+						updateTarea(tarea, id);
+						BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+
+				} else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
+					String undo = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(undo);
+
+					try {
+
+						Tareas tarea = getTareaById(id).getBody();
+						tarea.setEstado("activa");
+						updateTarea(tarea, id);
+						BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+
+				} else if (messageTextFromTelegram.indexOf(BotLabels.DELETE.getLabel()) != -1) {
+
+					String delete = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(delete);
+
+					try {
+
+						deleteTarea(id).getBody();
+						BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DELETED.getMessage(), this);
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+
+				} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
+							
+							BotHelper.sendMessageToTelegram(chatId, BotMessages.BYE.getMessage(), this);
+
+				} else if (messageTextFromTelegram.equals(BotCommands.TODO_LIST.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.LIST_ALL_ITEMS.getLabel())
+						|| messageTextFromTelegram.equals(BotLabels.MY_TODO_LIST.getLabel())) {
+							
+							//Obtenemos todas las tareas
+							List<Tareas> tareas = getAllTareas();
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							// command back to main screen
+							KeyboardRow mainScreenRowTop = new KeyboardRow();
+							mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+							keyboard.add(mainScreenRowTop);
+
+							KeyboardRow firstRow = new KeyboardRow();
+							firstRow.add(BotLabels.ADD_NEW_ITEM.getLabel());
+							keyboard.add(firstRow);
+
+							KeyboardRow myTodoListTitleRow = new KeyboardRow();
+							myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
+							keyboard.add(myTodoListTitleRow);
+
+							//Obtenemos las tareas solo de este usuario
+							List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
+									.collect(Collectors.toList());
+							
+							//Obtenemos las tareas activas
+							List<Tareas> tareasActivas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("activa"))
+									.collect(Collectors.toList());
+
+							for (Tareas tar : tareasActivas) {
+								if(!tar.getDescripcion().equals("temp desc")){
+									KeyboardRow currentRow = new KeyboardRow();
+									currentRow.add(tar.getDescripcion());
+									currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+									keyboard.add(currentRow);
+								}
+							}
+							//Obtenemos tareas finalizadas
+							List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada")).collect(Collectors.toList());
+
+							for (Tareas tar : tareasFinalizadas) {
+								KeyboardRow currentRow = new KeyboardRow();
+								currentRow.add(tar.getDescripcion());
+								currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+								currentRow.add(tar.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+								keyboard.add(currentRow);
+							}
+
+							// command back to main screen
+							KeyboardRow mainScreenRowBottom = new KeyboardRow();
+							mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+							keyboard.add(mainScreenRowBottom);
+
+							keyboardMarkup.setKeyboard(keyboard);
+
+							//Mensaje con tus tareas y titulos 
+							StringBuilder messageBuilder = new StringBuilder();
+							
+							messageBuilder.append("MIS TAREAS ACTIVAS").append("\n").append("\n");
+					
+							if(tareasActivas.size() == 0){
+								messageBuilder.append("No tienes tareas activas...").append("\n").append("\n");
+							}else{
+								for (Tareas tar : tareasActivas) {
+									if(!tar.getDescripcion().equals("temp desc")){
+										messageBuilder .append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+									}
+								}
+							}
+
+							messageBuilder.append("MIS TAREAS FINALIZADAS").append("\n").append("\n");
+
+							if(tareasFinalizadas.size() == 0){
+								messageBuilder.append("No tienes tareas finalizadas...").append("\n").append("\n");
+							}else{
+								for (Tareas tar : tareasFinalizadas) {
+									messageBuilder.append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+								}
+							}
+
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							String message = messageBuilder.toString();
+							messageToTelegram.setText(message);
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+							try {
+								execute(messageToTelegram);
+							} catch (TelegramApiException e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
+
+				} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
+							try {
+								SendMessage messageToTelegram = new SendMessage();
+								messageToTelegram.setChatId(chatId);
+								
+								if(tareaTitulo){
+									messageToTelegram.setText(BotMessages.TYPE_NEW_TODO_ITEM.getMessage());
+								}else{
+									messageToTelegram.setText("Antes de agregar una nueva tarea, agrega una descripción a la tarea que dejaste pendiente!");
+								}
+								
+								// hide keyboard
+								ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove(true);
+								messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+								// send message
+								execute(messageToTelegram);
+
+							} catch (Exception e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
+
+				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
+
+							modificarPerfil(chatId);
+							
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
+							
+							cambiarEquipo(chatId);
+
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_NOMBRE.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
+						
+							cambiarNombre(chatId);
+				}
+				else {
+					try {
+						//Obtener todas las tareas
+						List<Tareas> tareas = getAllTareas();
+						
+						//Obtenemos las tareas solo de este usuario
+						List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
+						.collect(Collectors.toList());
+
+						//Si no hay uan tarea a medio ingresar a la que le falte descripción, insertar tarea nueva
+
+						if(tareaTitulo){
+							Tareas newTarea = new Tareas();
+							newTarea.setTitulo(messageTextFromTelegram);
+							newTarea.setDescripcion("temp desc");
+							newTarea.setEstado("activa");
+							newTarea.setIdUsuario(chatId);
+							ResponseEntity entity = addTarea(newTarea);
+							tareaTitulo = false;
+
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Titulo agregado, agrega una descripción a la tarea:");
+							//messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+							execute(messageToTelegram);
+						}else{
+							for (Tareas tar : thisUserTareas) {
+
+								if(tar.getDescripcion().equals("temp desc")){
+									Tareas newTarea = new Tareas();
+									//Actualziar descripcion de tarea 
+									//Tareas tarea = getTareaById(id).getBody();
+									tar.setDescripcion(messageTextFromTelegram);
+									updateTarea(tar, tar.getID());
+									
+									SendMessage messageToTelegram = new SendMessage();
+									messageToTelegram.setChatId(chatId);
+									messageToTelegram.setText("Tarea agregada correctamente");
+									execute(messageToTelegram);
+									tareaTitulo = true;
+									break;
+								}		
+							}
+						}
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+				}
+			} else if(usuario.getTipo_usuario().equals("manager")){
+				if(cambiarNombre){
+					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
+
+				}else
+				if(cambiarEquipo){
+					cambiandoEquipo(messageTextFromTelegram, usuario, chatId);
+					
+				}else
+				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
+					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+						
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						// first row
+						KeyboardRow row = new KeyboardRow();
+
+						row.add(BotLabels.TAREAS_MI_EQUIPO.getLabel());
+						row.add(BotLabels.TAREAS_UNA_PERSONA.getLabel());
+						// Add the first row to the keyboard
+						keyboard.add(row);
+
+						// second row
+						row = new KeyboardRow();
+						row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+						keyboard.add(row);
+
+						row = new KeyboardRow();
+						row.add(BotLabels.MODIFICAR_PERFIL.getLabel());
+						row.add(BotLabels.CAMBIAR_ROL.getLabel());
+						keyboard.add(row);
+
+						// Set the keyboard
+						keyboardMarkup.setKeyboard(keyboard);
+
+						// Add the keyboard markup
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException e) {
+							logger.error(e.getLocalizedMessage(), e);
+						}
+
+				} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
+							
+							BotHelper.sendMessageToTelegram(chatId, BotMessages.BYE.getMessage(), this);
+
+				} else if (messageTextFromTelegram.equals(BotCommands.TAREAS_MI_EQUIPO.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.TAREAS_MI_EQUIPO.getLabel())) {
+
+							//VER TAREAS DE TODO EL EQUIPO: TITULO: NOMBRE, TITULO TAREA Y JUNTO SU ESTADO, DEBAJO PONEMOS DESCRIPCIÓN DE TAREA.
+
+							//Prepare message builder
+							StringBuilder messageBuilder = new StringBuilder();			
+							
+							//get all users and tasks
+							List<Usuario> usuarios = getAllUsuarios();
+							List<Tareas> tareas = getAllTareas();
+
+							//get users on the same team
+							List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo())
+									.collect(Collectors.toList());
+
+							//get task of those users
+							for (Usuario currentUser : thisUserTeam) {
+								if(currentUser.getTipo_usuario().equals("developer")){
+									messageBuilder.append("--").append(currentUser.getNombre().toUpperCase()).append("--").append("\n").append("\n");
+								}
+								for(Tareas tar: tareas){
+									if(currentUser.getID_usuario() == tar.getIdUsuario() && currentUser.getTipo_usuario().equals("developer")){
+										messageBuilder.append(tar.getTitulo().toUpperCase()).append(" (").append(tar.getEstado()).append(")").append("\n");
+										messageBuilder.append(tar.getDescripcion()).append("\n").append("\n");
+									}
+								}
+							}
+
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							String message = messageBuilder.toString();
+							messageToTelegram.setText(message);
+							//messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+							try {
+								execute(messageToTelegram);
+							} catch (TelegramApiException e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
+
+				}else if(messageTextFromTelegram.equals(BotLabels.TAREAS_UNA_PERSONA.getLabel())){
+					//VER TAREAS ACTIVAS Y FINALIZADAS POR PERSONA
+					// lISTAR EN MENU A LOS MIEMBROS DEL EQUIPO, MOSTRAR EN MENSAJE LAS TAREAS CON EL FORMATO DE ARRIBA, SE PUEDE SEPARAR COMO EL DEVELOPER THO
 					SendMessage messageToTelegram = new SendMessage();
 					messageToTelegram.setChatId(chatId);
-					
-					if(tareaTitulo){
-						messageToTelegram.setText(BotMessages.TYPE_NEW_TODO_ITEM.getMessage());
-					}else{
-						messageToTelegram.setText("Antes de agregar una nueva tarea, agrega una descripción a la tarea que dejaste pendiente!");
+					messageToTelegram.setText("Mostrando lista de miembros del equipo");
+
+					ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+					List<KeyboardRow> keyboard = new ArrayList<>();
+
+					List<Usuario> usuarios = getAllUsuarios();
+					List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
+
+					for (Usuario usr : thisUserTeam) {
+						if(usr.getTipo_usuario().equals("developer")){
+							KeyboardRow currentRow = new KeyboardRow();
+							currentRow.add(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID_usuario());
+							keyboard.add(currentRow);
+						}
 					}
-					
-					// hide keyboard
-					ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove(true);
+
+					// Set the keyboard
+					keyboardMarkup.setKeyboard(keyboard);
+
+					// Add the keyboard markup
 					messageToTelegram.setReplyMarkup(keyboardMarkup);
 
-					// send message
-					execute(messageToTelegram);
+					try {
+						execute(messageToTelegram);
+					} catch (TelegramApiException e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
 
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			}
-
-			else {
-				try {
-					//Obtener todas las tareas
-					List<Tareas> tareas = getAllTareas();
+				} else if (messageTextFromTelegram.indexOf(BotLabels.VER_TAREAS_PERSON_SELECCIONADA.getLabel()) != -1) {
 					
-					//Obtenemos las tareas solo de este usuario
-					List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == chatId)
-					.collect(Collectors.toList());
+					String id_string = messageTextFromTelegram.substring(messageTextFromTelegram.length() - 10);
+					Integer id = Integer.valueOf(id_string);
+					Usuario user = getUsuarioById(id).getBody();
 
-					//Si no hay uan tarea a medio ingresar a la que le falte descripción, insertar tarea nueva
+					try {
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
 
-					if(tareaTitulo){
-						Tareas newTarea = new Tareas();
-						newTarea.setTitulo(messageTextFromTelegram);
-						newTarea.setDescripcion("temp desc");
-						newTarea.setEstado("activa");
-						newTarea.setIdUsuario(chatId);
-						ResponseEntity entity = addTarea(newTarea);
-						tareaTitulo = false;
+						// command back to main screen
+						KeyboardRow mainScreenRowTop = new KeyboardRow();
+						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						keyboard.add(mainScreenRowTop);
+						
+						keyboardMarkup.setKeyboard(keyboard);
+
+						List<Tareas> tareas = getAllTareas();
+
+						//Obtenemos tareas del usuario que queremos ver
+						List<Tareas> thisUserTareas = tareas.stream().filter(tarea -> tarea.getIdUsuario() == id)
+							.collect(Collectors.toList());
+
+						//Obtenemos las tareas activas
+						List<Tareas> tareasActivas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("activa"))
+							.collect(Collectors.toList());
+
+						//Obtenemos tareas finalizadas
+						List<Tareas> tareasFinalizadas = thisUserTareas.stream().filter(tarea -> tarea.getEstado().equals("finalizada"))
+							.collect(Collectors.toList());
+						
+						//Mensaje con tus tareas y titulos 
+						StringBuilder messageBuilder = new StringBuilder();
+							
+						messageBuilder.append("TAREAS ACTIVAS DE ").append(user.getNombre().toUpperCase()).append("\n").append("\n");
+					
+						if(tareasActivas.size() == 0){
+							messageBuilder.append("Este developer no tiene tareas activas...").append("\n").append("\n");
+						}else{
+							for (Tareas tar : tareasActivas) {
+								if(!tar.getDescripcion().equals("temp desc")){
+									messageBuilder .append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+								}
+							}
+						}
+
+						messageBuilder.append("TAREAS FINALIZADAS DE ").append(user.getNombre().toUpperCase()).append("\n").append("\n");
+
+						if(tareasFinalizadas.size() == 0){
+							messageBuilder.append("Este developer no tiene tareas finalizadas...").append("\n").append("\n");
+						}else{
+							for (Tareas tar : tareasFinalizadas) {
+								messageBuilder.append(tar.getTitulo().toUpperCase()).append("\n").append(tar.getDescripcion()).append("\n").append("\n");
+							}
+						}
 
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Titulo agregado, agrega una descripción a la tarea:");
-						//messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
+						String message = messageBuilder.toString();
+						messageToTelegram.setText(message);
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
 						execute(messageToTelegram);
-					}else{
-						for (Tareas tar : thisUserTareas) {
 
-							if(tar.getDescripcion().equals("temp desc")){
-								Tareas newTarea = new Tareas();
-								//Actualziar descripcion de tarea 
-								//Tareas tarea = getTareaById(id).getBody();
-								tar.setDescripcion(messageTextFromTelegram);
-								updateTarea(tar, tar.getID());
-								
-								SendMessage messageToTelegram = new SendMessage();
-								messageToTelegram.setChatId(chatId);
-								messageToTelegram.setText("Tarea agregada correctamente");
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}				
+				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
+
+							modificarPerfil(chatId);
+							
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
+							
+							cambiarEquipo(chatId);
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_NOMBRE.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_NOMBRE.getLabel())){
+						
+							cambiarNombre(chatId);
+				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_ROL.getCommand())
+						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_ROL.getLabel())){
+							
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Mostrando lista de miembros del equipo, ¿A qué developer quieres convertir a Manager?");
+
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							List<Usuario> usuarios = getAllUsuarios();
+							List<Usuario> thisUserTeam = usuarios.stream().filter(user -> user.getID_equipo() == usuario.getID_equipo()).collect(Collectors.toList());
+
+							for (Usuario usr : thisUserTeam) {
+								if(usr.getTipo_usuario().equals("developer")){
+									KeyboardRow currentRow = new KeyboardRow();
+									currentRow.add(BotLabels.CAMBIAR_ROL_PERSONA_SELECCIONADA.getLabel() + BotLabels.POINTS.getLabel() + usr.getNombre() + " " + usr.getID_usuario());
+									keyboard.add(currentRow);
+								}
+							}
+
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+							try {
 								execute(messageToTelegram);
-								tareaTitulo = true;
-								break;
-							}		
-						}
-					}
+							} catch (TelegramApiException e) {
+								logger.error(e.getLocalizedMessage(), e);
+							}
 
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
+				}else if(messageTextFromTelegram.indexOf(BotLabels.CAMBIAR_ROL_PERSONA_SELECCIONADA.getLabel()) != -1){
+					String id_string = messageTextFromTelegram.substring(messageTextFromTelegram.length() - 10);
+					Integer id = Integer.valueOf(id_string);
+					Usuario user = getUsuarioById(id).getBody();
+
+					try {
+						
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("Usuario convertido a manager!");
+
+
+						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+						List<KeyboardRow> keyboard = new ArrayList<>();
+
+						// command back to main screen
+						KeyboardRow mainScreenRowTop = new KeyboardRow();
+						mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+						keyboard.add(mainScreenRowTop);
+						
+						keyboardMarkup.setKeyboard(keyboard);
+						messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+						user.setTipo_usuario("manager");
+						ResponseEntity entity = updateUsuario(user, user.getID_usuario());
+
+						execute(messageToTelegram);
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}				
 				}
 			}
+		}
+	}
+
+
+	public void modificarPerfil(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("¿Qué quieres modificar?");
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		// first row
+		KeyboardRow row = new KeyboardRow();
+		row.add(BotLabels.CAMBIAR_EQUIPO.getLabel());
+		row.add(BotLabels.CAMBIAR_NOMBRE.getLabel());
+		// Add the first row to the keyboard
+		keyboard.add(row);
+
+		// second row
+		row = new KeyboardRow();
+		row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+		row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+		keyboard.add(row);
+
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
+
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+		try {
+			execute(messageToTelegram);
+		} catch (TelegramApiException e) {
+			logger.error(e.getLocalizedMessage(), e);
+		}
+	}
+
+	public void cambiarEquipo(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("Seleccione su nuevo equipo: ");
+
+		cambiarEquipo = true;
+
+		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+		List<KeyboardRow> keyboard = new ArrayList<>();
+
+		List<Equipo> equipos = getAllEquipos();
+		equipos.remove(0); // Remove the null team
+
+		for (Equipo equipo : equipos) {
+			KeyboardRow currentRow = new KeyboardRow();
+			currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
+			keyboard.add(currentRow);
+		}
+
+		// Set the keyboard
+		keyboardMarkup.setKeyboard(keyboard);
+
+		// Add the keyboard markup
+		messageToTelegram.setReplyMarkup(keyboardMarkup);
+		try{
+			execute(messageToTelegram);
+		}catch(Exception e){
+			logger.error(e.getLocalizedMessage(), e);
+		}		
+	}
+
+	public void cambiandoEquipo(String messageTextFromTelegram, Usuario usuario, long chatId){
+		try{
+			String id_string = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+			Integer id_newTeam = Integer.valueOf(id_string);
+
+			usuario.setID_equipo(id_newTeam);
+			ResponseEntity entity = updateUsuario(usuario, chatId);
+			cambiarEquipo = false;
+
+			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
+		}catch(Exception e){
+						
+			SendMessage messageToTelegram = new SendMessage();
+			messageToTelegram.setChatId(chatId);
+			messageToTelegram.setText("Equipo no encontrado, seleccione un equipo valido: ");
+
+			ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+			List<KeyboardRow> keyboard = new ArrayList<>();
+
+			List<Equipo> equipos = getAllEquipos();
+			equipos.remove(0); // Remove the null team
+
+			for (Equipo equipo : equipos) {
+					KeyboardRow currentRow = new KeyboardRow();
+					currentRow.add(equipo.getID() + BotLabels.DASH.getLabel() + equipo.getNombre());
+					keyboard.add(currentRow);
+			}
+
+			// Set the keyboard
+			keyboardMarkup.setKeyboard(keyboard);
+
+			// Add the keyboard markup
+			messageToTelegram.setReplyMarkup(keyboardMarkup);
+			try{
+				execute(messageToTelegram);
+			}catch(Exception ex){
+				logger.error(ex.getLocalizedMessage(), ex);
+			}		
+		}
+	}
+
+	public void cambiarNombre(long chatId){
+		SendMessage messageToTelegram = new SendMessage();
+		messageToTelegram.setChatId(chatId);
+		messageToTelegram.setText("Escriba su nuevo nombre: ");
+
+		cambiarNombre = true;
+
+		try{
+			execute(messageToTelegram);
+		}catch(Exception e){
+			logger.error(e.getLocalizedMessage(), e);
+		}		
+
+	}
+
+	public void cambiandoNombre(String messageTextFromTelegram, Usuario usuario, long chatId){
+		try{
+			usuario.setNombre(messageTextFromTelegram);
+			ResponseEntity entity = updateUsuario(usuario, chatId);
+			cambiarNombre = false;
+
+			BotHelper.sendMessageToTelegram(chatId, "Cambio de nombre completado!", this);
+		}catch(Exception e){
+						
+			SendMessage messageToTelegram = new SendMessage();
+			messageToTelegram.setChatId(chatId);
+			messageToTelegram.setText("Nombre no valido, escriba otro nombre: ");
+
+			try{
+				execute(messageToTelegram);
+			}catch(Exception ex){
+				logger.error(ex.getLocalizedMessage(), ex);
+			}		
 		}
 	}
 
