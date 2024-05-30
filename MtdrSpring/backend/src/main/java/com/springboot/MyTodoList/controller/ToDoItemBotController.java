@@ -255,7 +255,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					ResponseEntity entity = updateUsuario(usuario, chatId);
 
-					BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
+					BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
@@ -271,7 +271,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
 							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente, ingrese la descripción del equipo...", this);
 						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
+							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
 						}
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
@@ -287,7 +287,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						if (equipo_usuario.getNombre().equals("NULLNAME")) {
 							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente, ingrese el nombre del equipo...", this);
 						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
+							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
 						}
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
@@ -308,7 +308,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
-						mainMenuDeveloper(chatId);
+						mainMenuDeveloper(chatId, BotMessages.HELLO_DEVELOPER.getMessage());
 
 				} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
 					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
@@ -550,7 +550,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 						
-						mainMenuManager(chatId);
+						mainMenuManager(chatId, BotMessages.HELLO_MANAGER.getMessage());
 
 				} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
@@ -855,13 +855,14 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			ResponseEntity entity = updateUsuario(usuario, chatId);
 			cambiarEquipo = false;
 
+			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
+
 			if(usuario.getTipo_usuario().equals("developer")){
-				mainMenuDeveloper(chatId);
+				mainMenuDeveloper(chatId, BotMessages.SELECCION_MENU.getMessage());
 			}else{
-				mainMenuManager(chatId);
+				mainMenuManager(chatId, BotMessages.SELECCION_MENU.getMessage());
 			}
 
-			BotHelper.sendMessageToTelegram(chatId, "Cambio de equipo completado!", this);
 		}catch(Exception e){
 						
 			SendMessage messageToTelegram = new SendMessage();
@@ -915,6 +916,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			cambiarNombre = false;
 
 			BotHelper.sendMessageToTelegram(chatId, "Cambio de nombre completado!", this);
+
+			if(usuario.getTipo_usuario().equals("developer")){
+				mainMenuDeveloper(chatId, BotMessages.SELECCION_MENU.getMessage());
+			}else{
+				mainMenuManager(chatId,BotMessages.SELECCION_MENU.getMessage());
+			}
+
 		}catch(Exception e){
 						
 			SendMessage messageToTelegram = new SendMessage();
@@ -929,10 +937,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	public void mainMenuDeveloper(long chatId){
+	public void mainMenuDeveloper(long chatId, String texto){
 		SendMessage messageToTelegram = new SendMessage();
 		messageToTelegram.setChatId(chatId);
-		messageToTelegram.setText(BotMessages.HELLO_DEVELOPER.getMessage());
+		messageToTelegram.setText(texto);
 
 		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 		List<KeyboardRow> keyboard = new ArrayList<>();
@@ -967,10 +975,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	public void mainMenuManager(long chatId){
+	public void mainMenuManager(long chatId, String texto){
 		SendMessage messageToTelegram = new SendMessage();
 		messageToTelegram.setChatId(chatId);
-		messageToTelegram.setText(BotMessages.HELLO_MANAGER.getMessage());
+		messageToTelegram.setText(texto);
 
 		ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
 		List<KeyboardRow> keyboard = new ArrayList<>();
