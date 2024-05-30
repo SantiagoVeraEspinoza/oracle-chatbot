@@ -477,7 +477,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
 
-							modificarPerfil(chatId);
+							modificarPerfil(chatId, usuario);
 							
 				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
@@ -703,7 +703,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}else if(messageTextFromTelegram.equals(BotCommands.MODIFICAR_PERFIL.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.MODIFICAR_PERFIL.getLabel())){
 
-							modificarPerfil(chatId);
+							modificarPerfil(chatId, usuario);
 							
 				}else if(messageTextFromTelegram.equals(BotCommands.CAMBIAR_EQUIPO.getCommand())
 						|| messageTextFromTelegram.equals(BotLabels.CAMBIAR_EQUIPO.getLabel())){
@@ -832,7 +832,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		try {
 			execute(messageToTelegram2);
 		} catch (TelegramApiException ex) {
-			logger.error(e.getLocalizedMessage(), ex);
+			logger.error(ex.getLocalizedMessage(), ex);
 		}
 	}
 
