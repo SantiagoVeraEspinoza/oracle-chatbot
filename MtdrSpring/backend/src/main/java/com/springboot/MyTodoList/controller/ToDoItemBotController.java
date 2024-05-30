@@ -257,11 +257,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 					BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, ahora puede utilizar el resto de comandos...", this);
 
-					if(usuario.getTipo_usuario().equals("developer")){
-						mainMenuDeveloper(chatId);
-					}else{
-						mainMenuManager(chatId);
-					}
+					// if(usuario.getTipo_usuario().equals("developer")){
+					// 	mainMenuDeveloper(chatId);
+					// }else{
+					// 	mainMenuManager(chatId);
+					// }
 
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
