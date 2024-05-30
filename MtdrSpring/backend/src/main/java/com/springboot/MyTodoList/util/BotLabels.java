@@ -9,7 +9,7 @@ public enum BotLabels {
 	DONE("TERMINAR"),
 	UNDO("DESHACER"),
 	DELETE("ELIMINAR"),
-	MY_TODO_LIST("MI ACTUAL LISTA DE TAREAS"),
+	MY_TODO_LIST("MI LISTA DE TAREAS"),
 	DASH("-"),
 	POINTS(": "),
 	TAREAS_MI_EQUIPO("Ver tareas de todo mi equipo"),
