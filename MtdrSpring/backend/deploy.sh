@@ -1,4 +1,5 @@
 #!/bin/bash
+IMAGE_TAG="0.1"
 SCRIPT_DIR=$(pwd)
 if [ -z "$TODO_PDB_NAME" ]; then
     echo "TODO_PDB_NAME not set. Will get it with state_get"
@@ -33,6 +34,7 @@ echo CURRENTTIME is $CURRENTTIME  ...this will be appended to generated deployme
 cp src/main/resources/todolistapp-springboot.yaml todolistapp-springboot-$CURRENTTIME.yaml
 
 sed -i "s|%DOCKER_REGISTRY%|${DOCKER_REGISTRY}|g" todolistapp-springboot-$CURRENTTIME.yaml
+sed -i "s|%IMAGE_TAG%|${IMAGE_TAG}|g" todolistapp-springboot-$CURRENTTIME.yaml
 
 sed -e "s|%DOCKER_REGISTRY%|${DOCKER_REGISTRY}|g" todolistapp-springboot-${CURRENTTIME}.yaml > /tmp/todolistapp-springboot-${CURRENTTIME}.yaml
 mv -- /tmp/todolistapp-springboot-$CURRENTTIME.yaml todolistapp-springboot-$CURRENTTIME.yaml
