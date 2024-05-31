@@ -12,7 +12,8 @@ public enum BotMessages {
 	NEW_ITEM_ADDED("Escribe un nuevo elemento de la lista de tareas a continuación y presiona el botón de enviar (flecha azul) en el lado derecho."),
 	BYE("¡Adiós! Selecciona /start para continuar."),
 	HELLO_DEVELOPER("¡Hola Developer! Soy ErmaChores!\n Escribe el titulo de una nueva tarea y presiona el botón de enviar (flecha azul), o selecciona una opción a continuación:"),
-	HELLO_MANAGER("¡Hola Manager! Soy ErmaChores!\n Puedes continuar al seleccionar una opción a continuación:");
+	HELLO_MANAGER("¡Hola Manager! Soy ErmaChores!\n Puedes continuar al seleccionar una opción en el menú:"),
+	SELECCION_MENU("Selecciona una opción del menú para continuar");
 
 	private String message;
 
