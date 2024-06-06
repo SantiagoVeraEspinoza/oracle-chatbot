@@ -1,5 +1,8 @@
 package com.springboot.MyTodoList.controller;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -297,6 +300,31 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}
 
 			if(usuario.getTipo_usuario().equals("developer")){
+				if(messageTextFromTelegram.equals("/correo")){
+					// Set up the SMTP server.
+					java.util.Properties props = new java.util.Properties();
+					props.put("mail.smtp.host", "smtp.myisp.com");
+					Session session = Session.getDefaultInstance(props, null);
+
+					// Construct the message
+					String to = "samuel.padilla45@gmail.com";
+					String from = "ermac.bot@gmail.com";
+					String subject = "TEST";
+					Message msg = new MimeMessage(session);
+					try {
+						msg.setFrom(new InternetAddress(from));
+						msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+						msg.setSubject(subject);
+						msg.setText("Hi,\n\nHow are you?");
+
+						// Send the message.
+						Transport.send(msg);
+						BotHelper.sendMessageToTelegram(chatId, "Correo enviado", this);
+
+					} catch (MessagingException e) {
+						BotHelper.sendMessageToTelegram(chatId, "Error al mandar correo", this);
+					}
+				}else
 				if(cambiarNombre){
 					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
 
