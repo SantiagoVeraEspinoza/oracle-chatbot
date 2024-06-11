@@ -403,7 +403,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 									isKeyValid = false;
 									messageSent = false;
 									//System.out.println("El tiempo de 5 minutos ha expirado. La clave ya no es válida.");
-									BotHelper.sendMessageToTelegram(chatId, "El tiempo de 5 minutos ha expirado. La clave ya no es válida.", this);
+									//BotHelper.sendMessageToTelegram(chatId, "El tiempo de 5 minutos ha expirado. La clave ya no es válida.", this);
 								}
 							}, 1 * 60 * 1000);
 
