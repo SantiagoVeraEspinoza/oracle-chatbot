@@ -2,6 +2,10 @@ package com.springboot.MyTodoList.controller;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Properties;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -48,6 +52,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private Boolean tareaTitulo = true;
 	private Boolean cambiarEquipo = false;
 	private Boolean cambiarNombre = false;
+	//New login
+	private Boolean allowLogin = false;
+	private static boolean isKeyValid = true;
+    private boolean messageSent = false;
+    int randomNumber = 0;
+    private boolean askingForMail = false;
+    Timer timer = new Timer();
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
@@ -72,259 +83,352 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			Equipo equipo_usuario = null;
 			if (usuario != null) equipo_usuario = getEquiposById(usuario.getID_equipo()).getBody();
 
-			if (usuario == null) {
-				try {
-					Usuario new_usuario = new Usuario();
-					new_usuario.setID_usuario(chatId);
-					new_usuario.setID_equipo(1);
-					new_usuario.setNombre("NULLNAME");
-					new_usuario.setTipo_usuario("nullptr");
+			if(allowLogin){
 
-					ResponseEntity entity = addUsuario(new_usuario);
-					
-					BotHelper.sendMessageToTelegram(chatId, "Usuario no encontrado, porfavor ingrese su nombre de usuario...", this);
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-				return;
-			} 
-			if (usuario.getNombre().equals("NULLNAME")) {
-				try {
-					usuario.setNombre(messageTextFromTelegram);
+				if (usuario == null) {
+					try {
+						Usuario new_usuario = new Usuario();
+						new_usuario.setID_usuario(chatId);
+						new_usuario.setID_equipo(1);
+						new_usuario.setNombre("NULLNAME");
+						new_usuario.setTipo_usuario("nullptr");
 
-					ResponseEntity entity = updateUsuario(usuario, chatId);
-
-					if (usuario.getNombre().equals("NULLNAME")) {
-						BotHelper.sendMessageToTelegram(chatId, "El nombre de usuario 'NULNAME' no es válido. Por favor ingrese otro nombre de usuario...", this);
-					} else {
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Nombre '" + usuario.getNombre() +  "' ingresado correctamente, por favor seleccione un tipo de usuario...");
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						KeyboardRow row = new KeyboardRow();
-						row.add("developer");
-						row.add("manager");
-						// Add the first row to the keyboard
-						keyboard.add(row);
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						execute(messageToTelegram);
-					}
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-				return;
-			} 
-			if (usuario.getTipo_usuario().equals("nullptr")) {
-				try {
-					if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto. Por favor ingrese un tipo de usuario correcto...");
-
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
-
-						KeyboardRow row = new KeyboardRow();
-						row.add("developer");
-						row.add("manager");
-						// Add the first row to the keyboard
-						keyboard.add(row);
-
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
-
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						execute(messageToTelegram);
-						return;
-					}
-
-					usuario.setTipo_usuario(messageTextFromTelegram);
-
-					ResponseEntity usuario_entity = updateUsuario(usuario, chatId);
-
-					List<Equipo> equipos = getAllEquipos();
-					equipos.remove(0); // Remove the null team
-
-					if (equipos.isEmpty()) {
-						Equipo new_equipo = new Equipo();
-						new_equipo.setNombre("NULLNAME");
-						new_equipo.setDescripcion("NULLDESC");
+						ResponseEntity entity = addUsuario(new_usuario);
 						
-						ResponseEntity equipo_entity = addEquipo(new_equipo);
+						BotHelper.sendMessageToTelegram(chatId, "Usuario no encontrado, porfavor ingrese su nombre de usuario...", this);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+					return;
+				} 
+				if (usuario.getNombre().equals("NULLNAME")) {
+					try {
+						usuario.setNombre(messageTextFromTelegram);
 
-						usuario.setID_equipo(new_equipo.getID());
+						ResponseEntity entity = updateUsuario(usuario, chatId);
 
-						ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
+						if (usuario.getNombre().equals("NULLNAME")) {
+							BotHelper.sendMessageToTelegram(chatId, "El nombre de usuario 'NULNAME' no es válido. Por favor ingrese otro nombre de usuario...", this);
+						} else {
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Nombre '" + usuario.getNombre() +  "' ingresado correctamente, por favor seleccione un tipo de usuario...");
 
-						BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario '" + usuario.getTipo_usuario() + "' ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
-					} else {
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...");
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
 
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
+							KeyboardRow row = new KeyboardRow();
+							row.add("developer");
+							row.add("manager");
+							// Add the first row to the keyboard
+							keyboard.add(row);
 
-						for (Equipo equipo : equipos) {
-							KeyboardRow currentRow = new KeyboardRow();
-							currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
-							keyboard.add(currentRow);
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+							execute(messageToTelegram);
+						}
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+					return;
+				} 
+				if (usuario.getTipo_usuario().equals("nullptr")) {
+					try {
+						if (!messageTextFromTelegram.equals("developer") && !messageTextFromTelegram.equals("manager")) {
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Tipo de usuario ingresado no es ni 'developer' ni 'manager', por favor seleccione un tipo de usuario correcto. Por favor ingrese un tipo de usuario correcto...");
+
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							KeyboardRow row = new KeyboardRow();
+							row.add("developer");
+							row.add("manager");
+							// Add the first row to the keyboard
+							keyboard.add(row);
+
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+							execute(messageToTelegram);
+							return;
 						}
 
-						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add("Añadir nuevo equipo");
-						keyboard.add(currentRow);
+						usuario.setTipo_usuario(messageTextFromTelegram);
 
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
+						ResponseEntity usuario_entity = updateUsuario(usuario, chatId);
 
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						execute(messageToTelegram);
-					}
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-				return;
-			} 
-			if (usuario.getID_equipo() == 1) {
-				try {
-					if (messageTextFromTelegram.equals("Añadir nuevo equipo")) {
-						Equipo new_equipo = new Equipo();
-						new_equipo.setNombre("NULLNAME");
-						new_equipo.setDescripcion("NULLDESC");
-						
-						ResponseEntity equipo_entity = addEquipo(new_equipo);
-
-						usuario.setID_equipo(new_equipo.getID());
-
-						ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
-
-						BotHelper.sendMessageToTelegram(chatId, "Ingrese el nombre de un nuevo equipo...", this);
-						return;
-					}
-
-					char ch = '-';
-					if (!messageTextFromTelegram.contains(Character.toString(ch))) {
-						messageTextFromTelegram = "0-NULL";
-					}
-
-					String id_equipo_str = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-					Integer id = Integer.valueOf(id_equipo_str) + 1;
-
-					usuario.setID_equipo(id);
-
-					if (usuario.getID_equipo() == 1) {
 						List<Equipo> equipos = getAllEquipos();
 						equipos.remove(0); // Remove the null team
 
-						SendMessage messageToTelegram = new SendMessage();
-						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("Entrada para equipo incorrecta, por favor seleccione un equipo para el usuario...");
+						if (equipos.isEmpty()) {
+							Equipo new_equipo = new Equipo();
+							new_equipo.setNombre("NULLNAME");
+							new_equipo.setDescripcion("NULLDESC");
+							
+							ResponseEntity equipo_entity = addEquipo(new_equipo);
 
-						ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-						List<KeyboardRow> keyboard = new ArrayList<>();
+							usuario.setID_equipo(new_equipo.getID());
 
-						for (Equipo equipo : equipos) {
+							ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
+
+							BotHelper.sendMessageToTelegram(chatId, "Tipo de usuario '" + usuario.getTipo_usuario() + "' ingresado correctamente, no existe ningun equipo actualmente. Ingrese el nombre de un nuevo equipo...", this);
+						} else {
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Tipo de usuario ingresado correctamente, por favor seleccione un equipo para el usuario...");
+
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							for (Equipo equipo : equipos) {
+								KeyboardRow currentRow = new KeyboardRow();
+								currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
+								keyboard.add(currentRow);
+							}
+
 							KeyboardRow currentRow = new KeyboardRow();
-							currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
+							currentRow.add("Añadir nuevo equipo");
 							keyboard.add(currentRow);
+
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+							execute(messageToTelegram);
+						}
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+					return;
+				} 
+				if (usuario.getID_equipo() == 1) {
+					try {
+						if (messageTextFromTelegram.equals("Añadir nuevo equipo")) {
+							Equipo new_equipo = new Equipo();
+							new_equipo.setNombre("NULLNAME");
+							new_equipo.setDescripcion("NULLDESC");
+							
+							ResponseEntity equipo_entity = addEquipo(new_equipo);
+
+							usuario.setID_equipo(new_equipo.getID());
+
+							ResponseEntity usuario_equipo_entity = updateUsuario(usuario, chatId);
+
+							BotHelper.sendMessageToTelegram(chatId, "Ingrese el nombre de un nuevo equipo...", this);
+							return;
 						}
 
-						KeyboardRow currentRow = new KeyboardRow();
-						currentRow.add("Añadir nuevo equipo");
-						keyboard.add(currentRow);
+						char ch = '-';
+						if (!messageTextFromTelegram.contains(Character.toString(ch))) {
+							messageTextFromTelegram = "0-NULL";
+						}
 
-						// Set the keyboard
-						keyboardMarkup.setKeyboard(keyboard);
+						String id_equipo_str = messageTextFromTelegram.substring(0,
+							messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+						Integer id = Integer.valueOf(id_equipo_str) + 1;
 
-						// Add the keyboard markup
-						messageToTelegram.setReplyMarkup(keyboardMarkup);
-						execute(messageToTelegram);
+						usuario.setID_equipo(id);
+
+						if (usuario.getID_equipo() == 1) {
+							List<Equipo> equipos = getAllEquipos();
+							equipos.remove(0); // Remove the null team
+
+							SendMessage messageToTelegram = new SendMessage();
+							messageToTelegram.setChatId(chatId);
+							messageToTelegram.setText("Entrada para equipo incorrecta, por favor seleccione un equipo para el usuario...");
+
+							ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+							List<KeyboardRow> keyboard = new ArrayList<>();
+
+							for (Equipo equipo : equipos) {
+								KeyboardRow currentRow = new KeyboardRow();
+								currentRow.add((equipo.getID() - 1) + BotLabels.DASH.getLabel() + equipo.getNombre());
+								keyboard.add(currentRow);
+							}
+
+							KeyboardRow currentRow = new KeyboardRow();
+							currentRow.add("Añadir nuevo equipo");
+							keyboard.add(currentRow);
+
+							// Set the keyboard
+							keyboardMarkup.setKeyboard(keyboard);
+
+							// Add the keyboard markup
+							messageToTelegram.setReplyMarkup(keyboardMarkup);
+							execute(messageToTelegram);
+							return;
+						}
+
+						Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
+
+						ResponseEntity entity = updateUsuario(usuario, chatId);
+
+						BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
+						allowLogin = false;
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+					}
+					return;
+				} 
+				if (equipo_usuario != null && equipo_usuario.getID() != 1) {
+					if (equipo_usuario.getNombre().equals("NULLNAME")) {
+						try {
+							equipo_usuario.setNombre(messageTextFromTelegram);
+
+							ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
+
+							if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
+								BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente, ingrese la descripción del equipo...", this);
+							} else {
+								BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
+								allowLogin = false;
+							}
+						} catch (Exception e) {
+							logger.error(e.getLocalizedMessage(), e);
+						}
 						return;
 					}
+					if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
+						try {
+							equipo_usuario.setDescripcion(messageTextFromTelegram);
 
-					Equipo this_equipo = getEquiposById(usuario.getID_equipo()).getBody();
+							ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
 
-					ResponseEntity entity = updateUsuario(usuario, chatId);
-
-					BotHelper.sendMessageToTelegram(chatId, "Equipo '" + this_equipo.getNombre() + "' registrado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-				return;
-			} 
-			if (equipo_usuario != null && equipo_usuario.getID() != 1) {
-				if (equipo_usuario.getNombre().equals("NULLNAME")) {
-					try {
-						equipo_usuario.setNombre(messageTextFromTelegram);
-
-						ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
-
-						if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
-							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente, ingrese la descripción del equipo...", this);
-						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
+							if (equipo_usuario.getNombre().equals("NULLNAME")) {
+								BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente, ingrese el nombre del equipo...", this);
+							} else {
+								BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
+								allowLogin = false;
+							}
+						} catch (Exception e) {
+							logger.error(e.getLocalizedMessage(), e);
 						}
-					} catch (Exception e) {
-						logger.error(e.getLocalizedMessage(), e);
+						return;
 					}
-					return;
 				}
-				if (equipo_usuario.getDescripcion().equals("NULLDESC")) {
-					try {
-						equipo_usuario.setDescripcion(messageTextFromTelegram);
 
-						ResponseEntity entity = updateEquipo(equipo_usuario, equipo_usuario.getID());
+			}else if(usuairo == null && messageSent){ //tambien checar por usuario nulo, por precaución
+			
+				if (isKeyValid &&  message.equals(Integer.toString(randomNumber))) {
+					//System.out.println("Clave correcta, acceso permitido.");
+					BotHelper.sendMessageToTelegram(chatId, "Clave correcta, presione /start para continuar", this);
+					//Aqui el usuario dejaría de ser nulo y esta logica ya no entra pero por si acaso aqui va codigo normal de login joder
+					//O allowLogin ) true y ya
+					allowLogin = true;
 
-						if (equipo_usuario.getNombre().equals("NULLNAME")) {
-							BotHelper.sendMessageToTelegram(chatId, "Descripción de equipo '" + equipo_usuario.getDescripcion() + "' ingresada correctamente, ingrese el nombre del equipo...", this);
-						} else {
-							BotHelper.sendMessageToTelegram(chatId, "Nombre de equipo '" + equipo_usuario.getNombre() + "' ingresado correctamente. Usuario registrado con éxito, utilice el comando /start para comenzar", this);
+					//RESET
+					messageSent = false; //solo hacer false cuando el usuairo ya se creo
+					isKeyValid = true;
+					timer.cancel();
+					timer = new Timer(); // Crear un nuevo Timer para futuras tareas
+
+					// Cancelar la tarea programada porque se recibió la clave a tiempo
+					timer.cancel();
+				} else if (!isKeyValid) {
+					//System.out.println("El tiempo ha expirado. No se puede aceptar la clave.");
+					BotHelper.sendMessageToTelegram(chatId, "El tiempo ha expirado. No se puede aceptar la clave.", this);
+					messageSent = false;
+					isKeyValid = true; // Reiniciar estado para el próximo intento
+					timer = new Timer(); // Crear un nuevo Timer para futuras tareas
+				} else {
+					BotHelper.sendMessageToTelegram(chatId, "Clave incorrecta, intente nuevamente.", this);
+				}
+
+			}else if(usuairo == null && !messageSent){  //Aqui se checa si usuario es nulo
+				Long chatId = update.getMessage().getChatId();
+
+				if(!askingForMail){
+					//sendMessage(generateSendMessage(chatId, "Escribe tu correo: "));
+					BotHelper.sendMessageToTelegram(chatId, "Escribe tu correo: ", this);
+					askingForMail = true;
+				}else{
+					String mail = message;
+
+					if(mail.contains("tec")){
+						//RANDOM NUMBER GENERATOR
+						Random random = new Random();
+						int min = 10000;
+						int max = 99999;
+						randomNumber = random.nextInt((max - min) + 1) + min;
+
+						//System.out.println("Enviando correo..: ");
+
+						Properties props = new Properties();
+						props.put("mail.smtp.host", "smtp.gmail.com");
+						props.put("mail.smtp.port", "587");
+						props.put("mail.smtp.auth", "true");
+						props.put("mail.smtp.starttls.enable", "true");
+
+						final String username = "ermacjavabot@gmail.com";
+						final String password = "urxlweuujlkrllkk"; // Utiliza una contraseña de aplicación generada desde tu cuenta de Google
+
+						Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+							protected PasswordAuthentication getPasswordAuthentication() {
+								return new PasswordAuthentication(username, password);
+							}
+						});
+
+						try {
+							// Construir el mensaje
+							String to = mail;
+							String from = "ermacjavabot@gmail.com";
+							String subject = "Codigo de verificación";
+							Message msg = new MimeMessage(session);
+							msg.setFrom(new InternetAddress(from));
+							msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+							msg.setSubject(subject);
+							msg.setText("Usa este codigo para verificar tu identidad en ErmaChores,\n\n" + Integer.toString(randomNumber));
+
+							// Enviar el mensaje
+							Transport.send(msg);
+							//sendMessage(generateSendMessage(chatId, "Correo enviado"));
+							BotHelper.sendMessageToTelegram(chatId, "Correo enviado, esperando codigo...", this);
+
+							messageSent = true;
+
+							timer = new Timer(); // Crear un nuevo Timer para futuras tareas
+
+							timer.schedule(new TimerTask() {
+								@Override
+								public void run() {
+									isKeyValid = false;
+									messageSent = false;
+									//System.out.println("El tiempo de 5 minutos ha expirado. La clave ya no es válida.");
+									BotHelper.sendMessageToTelegram(chatId, "El tiempo de 5 minutos ha expirado. La clave ya no es válida.", this);
+								}
+							}, 1 * 60 * 1000);
+
+						} catch (MessagingException e) {
+							//sendMessage(generateSendMessage(chatId, "Error al mandar correo"));
+							BotHelper.sendMessageToTelegram(chatId, "Error al mandar correo", this);
+
+							//System.out.println(e);
 						}
-					} catch (Exception e) {
-						logger.error(e.getLocalizedMessage(), e);
+						//System.out.println("Finalizar comunicación");
+
+					}else{
+						sendMessage(generateSendMessage(chatId, "Correo no pertenece a la organización"));
+						BotHelper.sendMessageToTelegram(chatId, "Lo siento pero ese correo no pertenece a la organización, no tienes autorización para usar este bot", this);
+
+						isKeyValid = true;
+						messageSent = false;
+						randomNumber = 0;
+						askingForMail = false;
+						timer = new Timer();
 					}
-					return;
 				}
-			}
+        	}
 
 			if(usuario.getTipo_usuario().equals("developer")){
-				if(messageTextFromTelegram.equals("/correo")){
-					// Set up the SMTP server.
-					java.util.Properties props = new java.util.Properties();
-					props.put("mail.smtp.host", "smtp.myisp.com");
-					Session session = Session.getDefaultInstance(props, null);
-
-					// Construct the message
-					String to = "samuel.padilla45@gmail.com";
-					String from = "ermac.bot@gmail.com";
-					String subject = "TEST";
-					Message msg = new MimeMessage(session);
-					try {
-						msg.setFrom(new InternetAddress(from));
-						msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-						msg.setSubject(subject);
-						msg.setText("Hi,\n\nHow are you?");
-
-						// Send the message.
-						Transport.send(msg);
-						BotHelper.sendMessageToTelegram(chatId, "Correo enviado", this);
-
-					} catch (MessagingException e) {
-						BotHelper.sendMessageToTelegram(chatId, "Error al mandar correo", this);
-					}
-				}else
 				if(cambiarNombre){
 					cambiandoNombre(messageTextFromTelegram, usuario, chatId);
 
