@@ -316,9 +316,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 				}
 
-			}else if(usuairo == null && messageSent){ //tambien checar por usuario nulo, por precaución
+			}else if(usuario == null && messageSent){ //tambien checar por usuario nulo, por precaución
 			
-				if (isKeyValid &&  message.equals(Integer.toString(randomNumber))) {
+				if (isKeyValid &&  messageTextFromTelegram.equals(Integer.toString(randomNumber))) {
 					//System.out.println("Clave correcta, acceso permitido.");
 					BotHelper.sendMessageToTelegram(chatId, "Clave correcta, presione /start para continuar", this);
 					//Aqui el usuario dejaría de ser nulo y esta logica ya no entra pero por si acaso aqui va codigo normal de login joder
@@ -343,15 +343,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					BotHelper.sendMessageToTelegram(chatId, "Clave incorrecta, intente nuevamente.", this);
 				}
 
-			}else if(usuairo == null && !messageSent){  //Aqui se checa si usuario es nulo
-				Long chatId = update.getMessage().getChatId();
+			}else if(usuario == null && !messageSent){  //Aqui se checa si usuario es nulo
+				//Long chatId = update.getMessage().getChatId();
 
 				if(!askingForMail){
 					//sendMessage(generateSendMessage(chatId, "Escribe tu correo: "));
 					BotHelper.sendMessageToTelegram(chatId, "Escribe tu correo: ", this);
 					askingForMail = true;
 				}else{
-					String mail = message;
+					String mail = messageTextFromTelegram;
 
 					if(mail.contains("tec")){
 						//RANDOM NUMBER GENERATOR
@@ -416,7 +416,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						//System.out.println("Finalizar comunicación");
 
 					}else{
-						sendMessage(generateSendMessage(chatId, "Correo no pertenece a la organización"));
+						//sendMessage(generateSendMessage(chatId, "Correo no pertenece a la organización"));
 						BotHelper.sendMessageToTelegram(chatId, "Lo siento pero ese correo no pertenece a la organización, no tienes autorización para usar este bot", this);
 
 						isKeyValid = true;
