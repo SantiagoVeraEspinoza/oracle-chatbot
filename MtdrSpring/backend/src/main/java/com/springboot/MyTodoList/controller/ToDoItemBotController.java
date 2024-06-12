@@ -60,6 +60,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
     private boolean askingForMail = false;
     Timer timer = new Timer();
 
+	private String  regex = "[a-zA-Z0-9/]+";
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
@@ -74,7 +75,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 
-		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches("[a-zA-Z0-9/]+")) {
+		if(usuario == null){
+			regex = "[a-zA-Z0-9/@.]+";
+		}else{
+			regex = "[a-zA-Z0-9/]+";
+		}
+
+		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches(regex)) {
 
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
@@ -405,7 +412,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 									//System.out.println("El tiempo de 5 minutos ha expirado. La clave ya no es válida.");
 									//BotHelper.sendMessageToTelegram(chatId, "El tiempo de 5 minutos ha expirado. La clave ya no es válida.", this);
 								}
-							}, 1 * 60 * 1000);
+							}, 5 * 60 * 1000);
 
 						} catch (MessagingException e) {
 							//sendMessage(generateSendMessage(chatId, "Error al mandar correo"));
