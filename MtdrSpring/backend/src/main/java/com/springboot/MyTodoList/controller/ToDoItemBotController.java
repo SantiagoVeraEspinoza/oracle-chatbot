@@ -78,7 +78,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		if(getUsuarioById(update.getMessage().getChatId()).getBody() == null){
 			regex = "[a-zA-Z0-9/@.]+";
 		}else{
-			regex = "[a-zA-Z0-9/]+";
+			regex = "[a-zA-Z0-9/-]+";
 		}
 
 		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches(regex)) {
