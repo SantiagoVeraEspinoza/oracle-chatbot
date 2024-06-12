@@ -923,6 +923,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}
 
 		}else{
+			long chatId = update.getMessage().getChatId();
 			BotHelper.sendMessageToTelegram(chatId, "Lo siento pero no puedo procesar una entrada que contenga caracteres no alfanumericos, intenta de nuevo con un mensaje valido", this);
 		}
 	}
