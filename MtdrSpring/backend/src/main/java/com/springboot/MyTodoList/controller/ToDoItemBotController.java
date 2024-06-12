@@ -74,7 +74,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 
-		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches("[a-zA-Z0-9]+")) {
+		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches("[a-zA-Z0-9/]+")) {
 
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
