@@ -74,7 +74,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	@Override
 	public void onUpdateReceived(Update update) {
 
-		if (update.hasMessage() && update.getMessage().hasText()) {
+		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches("[a-zA-Z0-9]+")) {
 
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
@@ -353,7 +353,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}else{
 					String mail = messageTextFromTelegram;
 
-					if(mail.contains("tec")){
+					if(mail.contains("@tec.mx")){
 						//RANDOM NUMBER GENERATOR
 						Random random = new Random();
 						int min = 10000;
@@ -631,39 +631,49 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						.collect(Collectors.toList());
 
 						//Si no hay uan tarea a medio ingresar a la que le falte descripción, insertar tarea nueva
-
-						if(tareaTitulo){
-							Tareas newTarea = new Tareas();
-							newTarea.setTitulo(messageTextFromTelegram);
-							newTarea.setDescripcion("temp desc");
-							newTarea.setEstado("activa");
-							newTarea.setIdUsuario(chatId);
-							ResponseEntity entity = addTarea(newTarea);
-							tareaTitulo = false;
-
-							SendMessage messageToTelegram = new SendMessage();
-							messageToTelegram.setChatId(chatId);
-							messageToTelegram.setText("Titulo agregado, agrega una descripción a la tarea:");
-							//messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
-							execute(messageToTelegram);
+						if(thisUserTareas.size() > 30){
+								BotHelper.sendMessageToTelegram(chatId, "Lo siento pero ya tienes 30 tareas, elimina alguna para poder agregar más", this);
 						}else{
-							for (Tareas tar : thisUserTareas) {
-
-								if(tar.getDescripcion().equals("temp desc")){
+							if(tareaTitulo){
+								if(messageTextFromTelegram.length() > 20){
+									BotHelper.sendMessageToTelegram(chatId, "Lo siento pero tu mensaje es muy largo, prueba a ingresar un titulo con menos de 20 carácteres", this);
+								}else{
 									Tareas newTarea = new Tareas();
-									//Actualziar descripcion de tarea 
-									//Tareas tarea = getTareaById(id).getBody();
-									tar.setDescripcion(messageTextFromTelegram);
-									updateTarea(tar, tar.getID());
-									
+									newTarea.setTitulo(messageTextFromTelegram);
+									newTarea.setDescripcion("temp desc");
+									newTarea.setEstado("activa");
+									newTarea.setIdUsuario(chatId);
+									ResponseEntity entity = addTarea(newTarea);
+									tareaTitulo = false;
+
 									SendMessage messageToTelegram = new SendMessage();
 									messageToTelegram.setChatId(chatId);
-									messageToTelegram.setText("Tarea agregada correctamente");
+									messageToTelegram.setText("Titulo agregado, agrega una descripción a la tarea:");
+									//messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
 									execute(messageToTelegram);
-									mainMenuDeveloper(chatId, BotMessages.SELECCION_MENU.getMessage());
-									tareaTitulo = true;
-									break;
-								}		
+								}
+							}else{
+								if(messageTextFromTelegram.length() > 50){
+										BotHelper.sendMessageToTelegram(chatId, "Lo siento pero tu mensaje es muy largo, prueba a ingresar una descripción con menos de 50 carácteres", this);
+								}else{
+									for (Tareas tar : thisUserTareas) {
+										if(tar.getDescripcion().equals("temp desc")){
+											Tareas newTarea = new Tareas();
+											//Actualziar descripcion de tarea 
+											//Tareas tarea = getTareaById(id).getBody();
+											tar.setDescripcion(messageTextFromTelegram);
+											updateTarea(tar, tar.getID());
+										
+											SendMessage messageToTelegram = new SendMessage();
+											messageToTelegram.setChatId(chatId);
+											messageToTelegram.setText("Tarea agregada correctamente");
+											execute(messageToTelegram);
+											mainMenuDeveloper(chatId, BotMessages.SELECCION_MENU.getMessage());
+											tareaTitulo = true;
+											break;
+										}		
+									}
+								}
 							}
 						}
 
@@ -911,6 +921,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}				
 				}
 			}
+
+		}else{
+			BotHelper.sendMessageToTelegram(chatId, "Lo siento pero no puedo procesar una entrada que contenga caracteres no alfanumericos, intenta de nuevo con un mensaje valido", this);
 		}
 	}
 
