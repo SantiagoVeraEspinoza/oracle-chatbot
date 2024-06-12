@@ -60,7 +60,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
     private boolean askingForMail = false;
     Timer timer = new Timer();
 
-	private String  regex = "[a-zA-Z0-9/ ]+";
+	private String  regex = "[a-zA-Z0-9/]+";
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, EquipoService equipoService, UsuarioService usuarioService, TareasService tareasService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
@@ -76,9 +76,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	public void onUpdateReceived(Update update) {
 
 		if(getUsuarioById(update.getMessage().getChatId()).getBody() == null){
-			regex = "[a-zA-Z0-9/@. ]+";
+			regex = "[a-zA-Z0-9/@.]+";
 		}else{
-			regex = "[a-zA-Z0-9/- ]+";
+			regex = "[a-zA-Z0-9/-]+";
 		}
 
 		if (update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().matches(regex)) {
